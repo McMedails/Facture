@@ -1,0 +1,42 @@
+Année --> 2024
+Mois --> Octobre
+Jours --> 19
+TJM --> 400
+HT --> 9120.0
+TTC --> 7600.0
+TVA --> 1520.0
+Urssaf --> 1064,0
+Restant --> 6536.0
+M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
+Facture KLIPER - 10.2024.pdf
+M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
+Déclaration 11.2024.pdf
+<->
+Année --> 2024
+Mois --> Novembre
+Jours --> 19
+TJM --> 400
+HT --> 9120.0
+TTC --> 7600.0
+TVA --> 1520.0
+Urssaf --> 1064,0
+Restant --> 6536.0
+M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
+Facture KLIPER - 11.2024.pdf
+M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
+Déclaration 12.2024.pdf
+<->
+Année --> 2025
+Mois --> Janvier
+Jours --> 14.5
+TJM --> 400
+HT --> 6960.0
+TTC --> 5800.0
+TVA --> 1160.0
+Urssaf --> 852,6
+Restant --> 4947.4
+M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
+Facture KLIPER - 12.2024.pdf
+M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
+Déclaration 10.2024.pdf
+<->
