@@ -22,7 +22,6 @@ import org.jfree.chart.plot.CategoryPlot;
 
 public class Facture
 {
-
     // Vérificateur de chiffre dans JTextField
     public static boolean isValidDouble(String text)
     {   
@@ -35,6 +34,9 @@ public class Facture
             return false; 
         } 
     }
+
+    // Variable de lecture du .txt
+    public static String line;
 
     public static void main (String[]args)
     {
@@ -84,7 +86,7 @@ public class Facture
 
         // Année et mois
         String _years[] = {"", "2024", "2025", "2026", "2027", "2028"};
-        String _mounts[] = {"", "Janvier", "Février", "Mars", "Avril", 
+        String _months[] = {"", "Janvier", "Février", "Mars", "Avril", 
                             "Mai", "Juin", "Juillet", "Août", "Septembre", 
                             "Octobre", "Novembre", "Décembre"};
 
@@ -116,16 +118,16 @@ public class Facture
         _pan1.add(_boxYears, _gbc);
 
         // A2 - Mois
-        JLabel _labMounts = new JLabel("Mois");
+        JLabel _labMonths = new JLabel("Mois");
         _gbc.gridx = 1;
         _gbc.gridy = 1;   
-        _pan1.add(_labMounts, _gbc);
-        JComboBox<String> _boxMounts = new JComboBox<>(_mounts);
-        _boxMounts.setPreferredSize(new Dimension(100, 18));
-        _boxMounts.setEnabled(true);
+        _pan1.add(_labMonths, _gbc);
+        JComboBox<String> _boxMonths = new JComboBox<>(_months);
+        _boxMonths.setPreferredSize(new Dimension(100, 18));
+        _boxMonths.setEnabled(true);
         _gbc.gridx = 1;
         _gbc.gridy = 2;
-        _pan1.add(_boxMounts, _gbc); 
+        _pan1.add(_boxMonths, _gbc); 
 
         // A3 - RAZ
         JButton _btReset1 = new JButton("RAZ");
@@ -514,7 +516,7 @@ public class Facture
             public void actionPerformed(ActionEvent e)
             {
                     /* A1 */ _boxYears.setSelectedItem("");
-                    /* A2 */ _boxMounts.setSelectedItem("");
+                    /* A2 */ _boxMonths.setSelectedItem("");
                     /* B1 */ _txtDays.setText("");  
                     /* B2 */ _txtTJM.setText("");
                     /* C2 */ _txtHT.setText("");
@@ -545,10 +547,10 @@ public class Facture
             try
             {       
                 String _years = (String) _boxYears.getSelectedItem();
-                String _mounts = (String) _boxMounts.getSelectedItem();
+                String _months = (String) _boxMonths.getSelectedItem();
 
                 // Vérification cellule non-vide + Calcule : Année + Mois
-                if ((_years == "") || (_mounts == "")) 
+                if ((_years == "") || (_months == "")) 
                 {
                     JOptionPane.showMessageDialog(null, "Veuillez entrer une date (année + mois)",
                                             "Demande d'informations", JOptionPane.INFORMATION_MESSAGE);
@@ -582,10 +584,10 @@ public class Facture
                 // Année 2025 (ACRE)
                 else if 
                 ((_years == "2025") && 
-                 (_mounts == "Janvier" ||
-                  _mounts == "Février"||
-                  _mounts == "Mars" ||
-                  _mounts == "Avril")) 
+                 (_months == "Janvier" ||
+                  _months == "Février"||
+                  _months == "Mars" ||
+                  _months == "Avril")) 
                 {
                     _TaxeUrssaf1 = _TTC1 * ((2.2 + 12.3 + 0.2) / 100);
                 }
@@ -621,7 +623,7 @@ public class Facture
                 File _file = new File(_filePath);
 
                 /* A1 */  String _slctYears = (String)           "Année --> " + _boxYears.getSelectedItem();
-                /* A2 */  String _slctMounts = (String)          "Mois --> " + _boxMounts.getSelectedItem();
+                /* A2 */  String _slctMonths = (String)          "Mois --> " + _boxMonths.getSelectedItem();
                 /* B1 */  String _slctDays = (String)            "Jours --> " + _txtDays.getText();
                 /* B2 */  String _slctTJM = (String)             "TJM --> " + _txtTJM.getText();
                 /* C1 */  String _slctHT = (String)              "HT --> " + _txtHT.getText();
@@ -662,7 +664,7 @@ public class Facture
                             // Ajoute la ligne dans le fichier
                             Files.write(Paths.get(_filePath),
                             ( /* A1 */ _slctYears + System.lineSeparator() +
-                              /* A2 */ _slctMounts + System.lineSeparator() +
+                              /* A2 */ _slctMonths + System.lineSeparator() +
                               /* B1 */ _slctDays + System.lineSeparator() +
                               /* B2 */ _slctTJM + System.lineSeparator() +
                               /* C2 */ _slctHT + System.lineSeparator() +
@@ -726,7 +728,6 @@ public class Facture
 
                 try (BufferedReader reader = new BufferedReader(new FileReader("Facture.txt"))) 
                 {
-                    String line;
                     while ((line = reader.readLine()) != null) 
                     {
                         // Ligne vide, on arrête
@@ -735,7 +736,6 @@ public class Facture
                             break;
                         }
                         
-                        String _scanMount = line.substring(line.indexOf("Mois --> ") + 9).trim();
                         // Détection début de l'année sélectionnée
                         if (line.contains("Année --> " + selectedYear)) 
                         {
@@ -879,24 +879,19 @@ public class Facture
                                  GRAPHIQUE HT
         *************************************************************/
 
-        CategoryDataset _datasetHT = BarChartPanel.createDataset(_scanMount.getText(), _TotalHT);
-        CategoryDataset _datasetTTC = BarChartPanel.createDataset("Total TTC", _TotalTTC);
-
-        BarChartPanel _chartPanelHT = new BarChartPanel(_datasetHT);
-        BarChartPanel _chartPanelTTC = new BarChartPanel(_datasetTTC);
-
         // Positionnement des éléments
         _gbc.gridwidth = 3;
         _gbc.gridx = 0;
         _gbc.gridy = 0;
 
-        JTabbedPane _tabHT = new JTabbedPane();
-        JTabbedPane _tabTTC = new JTabbedPane();
-        _tabHT.addTab("Total HT", _chartPanelHT);
-        _tabTTC.addTab("Total TCC", _chartPanelTTC);
-        _pan2.add(_tabHT, _gbc);
-        _pan2.add(_tabTTC, _gbc);
+        // Création du graphique à barres
+        BarChartPanel _chartPanel = new BarChartPanel();
+        _chartPanel.setPreferredSize(new Dimension(340,400));
         
+        JTabbedPane _tabHT = new JTabbedPane();       
+        _tabHT.addTab("Total HT", _chartPanel);
+        _pan2.add(_tabHT, _gbc);
+
         /************************************************************ 
                                  LANCEMENT 
         *************************************************************/
@@ -906,3 +901,9 @@ public class Facture
         _fen.setVisible(true); 
     }
 }
+
+/*
+        JTabbedPane _tabTTC = new JTabbedPane();
+        _tabTTC.addTab("Total TCC", BarChartPanel._chartPanelTTC);
+        _pan2.add(_tabTTC, _gbc);
+*/
