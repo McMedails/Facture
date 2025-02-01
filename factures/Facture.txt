@@ -2,8 +2,8 @@ Année --> 2024
 Mois --> Octobre
 Jours --> 19
 TJM --> 400
-HT --> 9120.0
-TTC --> 7600.0
+TTC --> 9120.0
+HT --> 7600.0
 TVA --> 1520.0
 Urssaf --> 1064,0
 Restant --> 6536.0
@@ -16,8 +16,8 @@ Année --> 2024
 Mois --> Novembre
 Jours --> 19
 TJM --> 400
-HT --> 9120.0
-TTC --> 7600.0
+TTC --> 9120.0
+HT --> 7600.0
 TVA --> 1520.0
 Urssaf --> 1064,0
 Restant --> 6536.0
@@ -30,8 +30,8 @@ Année --> 2025
 Mois --> Janvier
 Jours --> 14.5
 TJM --> 400
-HT --> 6960.0
-TTC --> 5800.0
+TTC --> 6960.0
+HT --> 5800.0
 TVA --> 1160.0
 Urssaf --> 852,6
 Restant --> 4947.4

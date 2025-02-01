@@ -37,6 +37,7 @@ public class Facture
 
     // Variable de lecture du .txt
     public static String line;
+    // Données pour graphique
     public static DefaultCategoryDataset _defaultDataset = new DefaultCategoryDataset();
 
     public static void main (String[]args)
@@ -160,29 +161,29 @@ public class Facture
         _gbc.gridy = 4;
         _pan1.add(_btTVA, _gbc);
 
-        // C1 - Résultat HT
-        JLabel _labHT = new JLabel("HT");
-        _gbc.gridx = 0;
-        _gbc.gridy = 5;   
-        _pan1.add(_labHT, _gbc);
-        JTextField _txtHT = new JTextField();
-        _txtHT.setPreferredSize(new Dimension(60, 18));
-        _txtHT.setEnabled(true);
-        _gbc.gridx = 0;
-        _gbc.gridy = 6;
-        _pan1.add(_txtHT, _gbc);
-
-        // C2 - Résultat TTC
+        // C1 - Résultat TTC
         JLabel _labTTC = new JLabel("TTC");
-        _gbc.gridx = 1;
+        _gbc.gridx = 0;
         _gbc.gridy = 5;   
         _pan1.add(_labTTC, _gbc);
         JTextField _txtTTC = new JTextField();
         _txtTTC.setPreferredSize(new Dimension(60, 18));
         _txtTTC.setEnabled(true);
-        _gbc.gridx = 1;
+        _gbc.gridx = 0;
         _gbc.gridy = 6;
         _pan1.add(_txtTTC, _gbc); 
+
+        // C2 - Résultat HT
+        JLabel _labHT = new JLabel("HT");
+        _gbc.gridx = 1;
+        _gbc.gridy = 5;   
+        _pan1.add(_labHT, _gbc);
+        JTextField _txtHT = new JTextField();
+        _txtHT.setPreferredSize(new Dimension(60, 18));
+        _txtHT.setEnabled(true);
+        _gbc.gridx = 1;
+        _gbc.gridy = 6;
+        _pan1.add(_txtHT, _gbc);
 
         // C3 - Différence TVA
         JLabel _labTVA = new JLabel("TVA");
@@ -336,29 +337,29 @@ public class Facture
         _gbc.gridy = 1;       
         _pan2.add(_labTotalImpots, _gbc);
 
-        // A1 - Résultat Total HT
-        JLabel _labTotalImpotsHT = new JLabel("Total HT");
-        _gbc.gridx = 0;
-        _gbc.gridy = 2;   
-        _pan2.add(_labTotalImpotsHT, _gbc);
-        JTextField _txtTotalHT = new JTextField();
-        _txtTotalHT.setPreferredSize(new Dimension(60, 18));
-        _txtTotalHT.setEnabled(true);
-        _gbc.gridx = 0;
-        _gbc.gridy = 3;
-        _pan2.add(_txtTotalHT, _gbc);
-
         // A2 - Résultat Total TTC
         JLabel _labTotalImpotsTTC = new JLabel("Total TTC");
-        _gbc.gridx = 1;
+        _gbc.gridx = 0;
         _gbc.gridy = 2;   
         _pan2.add(_labTotalImpotsTTC, _gbc);
         JTextField _txtTotalTTC = new JTextField();
         _txtTotalTTC.setPreferredSize(new Dimension(60, 18));
         _txtTotalTTC.setEnabled(true);
-        _gbc.gridx = 1;
+        _gbc.gridx = 0;
         _gbc.gridy = 3;
         _pan2.add(_txtTotalTTC, _gbc); 
+
+        // A1 - Résultat Total HT
+        JLabel _labTotalImpotsHT = new JLabel("Total HT");
+        _gbc.gridx = 1;
+        _gbc.gridy = 2;   
+        _pan2.add(_labTotalImpotsHT, _gbc);
+        JTextField _txtTotalHT = new JTextField();
+        _txtTotalHT.setPreferredSize(new Dimension(60, 18));
+        _txtTotalHT.setEnabled(true);
+        _gbc.gridx = 1;
+        _gbc.gridy = 3;
+        _pan2.add(_txtTotalHT, _gbc);
 
         // A3 - Années
         JLabel _labYearsTotal = new JLabel("Année");
@@ -516,8 +517,8 @@ public class Facture
                     /* A2 */ _boxMonths.setSelectedItem("");
                     /* B1 */ _txtDays.setText("");  
                     /* B2 */ _txtTJM.setText("");
+                    /* C1 */ _txtTTC.setText("");
                     /* C2 */ _txtHT.setText("");
-                    /* C2 */ _txtTTC.setText("");
                     /* C3 */ _txtTVA.setText("");
                     /* D1 */ _txtTaxeUrssaf.setText("");
                     /* D2 */ _txtTaxe.setText("");
@@ -556,9 +557,9 @@ public class Facture
 
                 double _days1 = Double.parseDouble(_txtDays.getText());
                 double _TJM1 = Double.parseDouble(_txtTJM.getText()); 
-                _TTC1 = _days1 * _TJM1;
-                _HT1 = _TTC1 * 1.2;
-                _TVA1 = _HT1 - _TTC1;
+                _HT1 = _days1 * _TJM1;
+                _TTC1 = _HT1 * 1.2;
+                _TVA1 = _TTC1 - _HT1;
 
                 //____ Calcule Impôts (HT + TTC) ___\
                 if (! _txtDays.getText().isEmpty() && ! _txtTJM.getText().isEmpty())
@@ -576,7 +577,7 @@ public class Facture
                 if
                 (_years == "2024")
                 {
-                    _TaxeUrssaf1 = _TTC1 * ((2.2 + 11.6 + 0.2) / 100);
+                    _TaxeUrssaf1 = _HT1 * ((2.2 + 11.6 + 0.2) / 100);
                 }
                 // Année 2025 (ACRE)
                 else if 
@@ -586,19 +587,19 @@ public class Facture
                   _months == "Mars" ||
                   _months == "Avril")) 
                 {
-                    _TaxeUrssaf1 = _TTC1 * ((2.2 + 12.3 + 0.2) / 100);
+                    _TaxeUrssaf1 = _HT1 * ((2.2 + 12.3 + 0.2) / 100);
                 }
                 // Année 2025 (sans ACRE)
                 else
                 {
-                    _TaxeUrssaf1 = _TTC1 * ((2.2 + 24.6 + 0.2) / 100);
+                    _TaxeUrssaf1 = _HT1 * ((2.2 + 24.6 + 0.2) / 100);
                 }
                 // Résultat de calcul
                 String _decimal = String.format("%.1f", _TaxeUrssaf1);
                 _txtTaxeUrssaf.setText(_decimal);
 
                 //____ Calcul URSSAF (Différence) ___\
-                _Taxe1 = _TTC1 - _TaxeUrssaf1;
+                _Taxe1 = _HT1 - _TaxeUrssaf1;
                 String _Taxe1String = Double.toString(_Taxe1);
                 _txtTaxe.setText(_Taxe1String);
             }
@@ -623,8 +624,8 @@ public class Facture
                 /* A2 */  String _slctMonths = (String)          "Mois --> " + _boxMonths.getSelectedItem();
                 /* B1 */  String _slctDays = (String)            "Jours --> " + _txtDays.getText();
                 /* B2 */  String _slctTJM = (String)             "TJM --> " + _txtTJM.getText();
-                /* C1 */  String _slctHT = (String)              "HT --> " + _txtHT.getText();
-                /* C2 */  String _slctTTC = (String)             "TTC --> " + _txtTTC.getText();
+                /* C1 */  String _slctTTC = (String)             "TTC --> " + _txtTTC.getText();
+                /* C2 */  String _slctHT = (String)              "HT --> " + _txtHT.getText();
                 /* C3 */  String _slctTVA = (String)             "TVA --> " + _txtTVA.getText();
                 /* D1 */  String _slctTaxeUrssaf = (String)      "Urssaf --> " + _txtTaxeUrssaf.getText();
                 /* D2 */  String _slctTaxe = (String)            "Restant --> " + _txtTaxe.getText(); 
@@ -664,8 +665,8 @@ public class Facture
                               /* A2 */ _slctMonths + System.lineSeparator() +
                               /* B1 */ _slctDays + System.lineSeparator() +
                               /* B2 */ _slctTJM + System.lineSeparator() +
+                              /* C1 */ _slctTTC + System.lineSeparator() +
                               /* C2 */ _slctHT + System.lineSeparator() +
-                              /* C2 */ _slctTTC + System.lineSeparator() +
                               /* C3 */ _slctTVA + System.lineSeparator() +
                               /* D1 */ _slctTaxeUrssaf + System.lineSeparator() +
                               /* D2 */ _slctTaxe + System.lineSeparator() +
@@ -689,7 +690,6 @@ public class Facture
                     {
                         ex.printStackTrace();
                     }
-                
                 }
             }
         });
@@ -818,7 +818,7 @@ public class Facture
                             String _convTotalHT = line.substring(line.indexOf("HT --> ") + 7).trim();
                             _totalHT += Double.parseDouble(_convTotalHT); 
                             // Caclul TVA
-                            double _totalTTC = _totalHT / 1.2;
+                            double _totalTTC = _totalHT * 1.2;
                             String convTotalTTC = Double.toString(_totalTTC);
                             _txtTotalTTC.setText(convTotalTTC);
 
@@ -831,19 +831,19 @@ public class Facture
                                 // Année 2024 (ACRE)
                                 if (_acre2024) 
                                 {
-                                    _totalUrssaf = _totalTTC * ((2.2 + 11.6 + 0.2) / 100);
+                                    _totalUrssaf = _totalHT * ((2.2 + 11.6 + 0.2) / 100);
                                 }
                                 // Année 2025 (ACRE avec et sans)
                                 if (_acre2025) 
                                 {
-                                    _totalii = (_ii * (_totalTTC * ((2.2 + 12.3 + 0.2) / 100)));
-                                    _totaljj = (_jj * (_totalTTC * ((2.2 + 24.6 + 0.2) / 100)));
+                                    _totalii = (_ii * (_totalHT * ((2.2 + 12.3 + 0.2) / 100)));
+                                    _totaljj = (_jj * (_totalHT * ((2.2 + 24.6 + 0.2) / 100)));
                                     _totalUrssaf = (_totalii + _totaljj) / (_ii + _jj);
                                 }
                                 // Année 2025 (sans ACRE) ou > 2025
                                 if ((!_acre2024 && !_acre2025)) 
                                 {
-                                    _totalUrssaf = _totalTTC * ((2.2 + 24.6 + 0.2) / 100);
+                                    _totalUrssaf = _totalHT * ((2.2 + 24.6 + 0.2) / 100);
                                 }
 
                                 /************************* GRAPHIQUE **************************/ 
@@ -944,7 +944,7 @@ public class Facture
         *************************************************************/
 
         // Création du graphique à barres
-        JFreeChart _chart = ChartFactory.createBarChart("Montant HT",    /* Titre du graphique */
+        JFreeChart _chart = ChartFactory.createBarChart("Résultats",     /* Titre du graphique */
                                                         null,            /* Axe des abscisses */ 
                                                         null,            /* Axe des ordonnées */  
                             _defaultDataset, PlotOrientation.HORIZONTAL, true,   /*Légende */ 
@@ -968,7 +968,7 @@ public class Facture
         _chartPanel.setPreferredSize(new Dimension(340,400));
         
         JTabbedPane _tabHT = new JTabbedPane();       
-        _tabHT.addTab("Total HT", _chartPanel);
+        _tabHT.addTab("Graphique", _chartPanel);
         _pan2.add(_tabHT, _gbc);
 
         /************************************************************ 
