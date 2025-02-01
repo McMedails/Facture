@@ -37,6 +37,7 @@ public class Facture
 
     // Variable de lecture du .txt
     public static String line;
+    public static DefaultCategoryDataset _defaultDataset = new DefaultCategoryDataset();
 
     public static void main (String[]args)
     {
@@ -49,7 +50,6 @@ public class Facture
         JFrame _fen = new JFrame();
         JPanel _pan1 = new JPanel();
         JPanel _pan2 = new JPanel();
-        JPanel _pan3 = new JPanel();
 
         // Configuration Fenetre/Panel
         _fen.setTitle("Gestionnaie de facture");
@@ -58,11 +58,8 @@ public class Facture
         _fen.setResizable(false);
         _pan1.setBackground(Color.LIGHT_GRAY);
         _pan2.setBackground(Color.LIGHT_GRAY);
-        _pan3.setBackground(Color.WHITE);
         _pan1.setLayout(new GridBagLayout());     
         _pan2.setLayout(new GridBagLayout());
-        _pan3.setLayout(new BorderLayout());
-        _pan3.setPreferredSize(new Dimension(350, 420));
 
         // Ajout du scroll aux panels
         JScrollPane _scroll1 = new JScrollPane(_pan1);
@@ -719,12 +716,22 @@ public class Facture
                     return;
                 }
 
-                double _totalHT = 0.0;
-                boolean isCurrentYear = false;
+                boolean _currentYear = false;
+                String _currentMonth = null;
+                Double _currentHT = null;
                 boolean _acre2024 = false;
                 boolean _acre2025 = false;
-                double _ii = 0.0;
-                double _jj = 0.0;
+                Double _totalHT = 0.0;
+                Double _ii = 0.0;
+                Double _jj = 0.0;
+                Double[] _graphTotauxHT = new Double[12];
+                String[] _graphMonths = {"Janvier", "Février", "Mars", "Avril", 
+                                         "Mai", "Juin", "Juillet", "Août", "Septembre", 
+                                         "Octobre", "Novembre", "Décembre"};
+
+                /************************************************************ 
+                                        LECTURE .TXT
+                *************************************************************/
 
                 try (BufferedReader reader = new BufferedReader(new FileReader("Facture.txt"))) 
                 {
@@ -736,10 +743,14 @@ public class Facture
                             break;
                         }
                         
+                        /************************************************************ 
+                                                 CALCULES
+                        *************************************************************/
+
                         // Détection début de l'année sélectionnée
                         if (line.contains("Année --> " + selectedYear)) 
                         {
-                            isCurrentYear = true;  
+                            _currentYear = true;  
                             // Année 2024 (ACRE)
                             if (line.contains("Année --> 2024")) 
                             {
@@ -785,15 +796,23 @@ public class Facture
                                         _jj++;
                                     }
                             }
-             
+  
+                        // Chercher le mois
+                        if (line.contains("Mois --> ")) 
+                        {   
+                            _currentMonth = line.substring(line.indexOf("Mois --> ") + 9).trim();
+                        }
+
                         // Détection d'une autre année, on arrête si on était dans notre année
-                        if (line.contains("Année --> ") && isCurrentYear) 
+                        if (line.contains("Année --> ") && _currentYear) 
                         {
                             break;
                         }
-                        
+
+                        /************************* CALCULES **************************/  
+
                         // Si on est dans la bonne année, on additionne les HT
-                        if (isCurrentYear && line.contains("HT --> ")) 
+                        if (_currentYear && line.contains("HT --> ")) 
                         {
                             //____ Calcule Impôts (HT + TTC) ___\
                             String _convTotalHT = line.substring(line.indexOf("HT --> ") + 7).trim();
@@ -827,14 +846,59 @@ public class Facture
                                     _totalUrssaf = _totalTTC * ((2.2 + 24.6 + 0.2) / 100);
                                 }
 
+                                /************************* GRAPHIQUE **************************/ 
+
+                                try 
+                                {
+                                    _currentHT = Double.parseDouble(_convTotalHT.replace(",", "."));
+                                } 
+                                catch (NumberFormatException exc) 
+                                {
+                                    _currentHT = null;
+                                }
+    
+                                if (_currentMonth != null && _currentHT != null) 
+                                {
+                                    // Trouver le mois correspondant et stocker la valeur HT
+                                    for (int ii = 0; ii < _graphMonths.length; ii++) 
+                                    {
+                                        if (_graphMonths[ii].equalsIgnoreCase(_currentMonth)) 
+                                        {
+                                            _graphTotauxHT[ii] = _currentHT;
+                                            break; 
+                                        }
+                                    }
+                                }
+
                                 // Résultat de calcul
                                 _totalTaxe = _totalHT - _totalUrssaf;
                                 String _resultUrssaf = String.format("%.1f", _totalUrssaf);
                                 String _resultTaxe = String.format("%.1f", _totalTaxe);
                                 _txtTotalTaxeUrssaf.setText(_resultUrssaf);
                                 _txtTotalTaxe.setText(_resultTaxe);
-                        }   
-                    }  
+
+                                // Réinitialiser pour le prochain mois
+                                _currentMonth = null;
+                                _currentHT = null;
+                        }  
+                        
+                        /************************* GRAPHIQUE **************************/
+
+                        // Remplir le dataset avec les données des mois et des totaux HT
+                        for (int ii = 0; ii < _graphMonths.length; ii++)
+                        {
+                            // Ajouter les valeurs (totaux HT) au dataset pour chaque mois
+                            if (_graphTotauxHT[ii] != null)
+                            {
+                                _defaultDataset.addValue(_graphTotauxHT[ii], "Hors Taxe", _graphMonths[ii]);
+                            }
+                        }    
+                    }
+  
+                    /************************************************************ 
+                                             AFFICHGAGE
+                    *************************************************************/
+
                     // Affichage du résultat sans décimales
                     _txtTotalHT.setText(String.format("%.0f", _totalHT));
 
@@ -873,11 +937,26 @@ public class Facture
                     /* B1 */ _txtTotalTaxeUrssaf.setText("");
                     /* B2 */ _txtTotalTaxe.setText("");
             }
-        });
+        });   
 
         /************************************************************ 
-                                 GRAPHIQUE HT
+                                GRAPHIQUE
         *************************************************************/
+
+        // Création du graphique à barres
+        JFreeChart _chart = ChartFactory.createBarChart("Montant HT",    /* Titre du graphique */
+                                                        null,            /* Axe des abscisses */ 
+                                                        null,            /* Axe des ordonnées */  
+                            _defaultDataset, PlotOrientation.HORIZONTAL, true,   /*Légende */ 
+                                                                         true,   /*Info tooltips */ 
+                                                                         false); /* URL */
+
+        // Personnalisation du graphique
+        CategoryPlot _catPlot = _chart.getCategoryPlot();
+        _catPlot.setDomainGridlinesVisible(true);
+        _catPlot.setRangeGridlinesVisible(true);
+        _catPlot.setDomainGridlinePaint(Color.BLACK);
+        _catPlot.setRangeGridlinePaint(Color.BLACK);
 
         // Positionnement des éléments
         _gbc.gridwidth = 3;
@@ -885,7 +964,7 @@ public class Facture
         _gbc.gridy = 0;
 
         // Création du graphique à barres
-        BarChartPanel _chartPanel = new BarChartPanel();
+        ChartPanel _chartPanel = new ChartPanel(_chart);
         _chartPanel.setPreferredSize(new Dimension(340,400));
         
         JTabbedPane _tabHT = new JTabbedPane();       
