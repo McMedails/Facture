@@ -23,11 +23,20 @@
             <scope>test</scope>
         </dependency>
         
+		<!-- Utilisation d'un graphique -->
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
             <version>1.5.3</version>
         </dependency>
+		
+		<!-- Utilisation d'un calendrier -->
+		<dependency>
+			<groupId>com.toedter</groupId>
+			<artifactId>jcalendar</artifactId>
+			<version>1.4</version>
+		</dependency>
+
     </dependencies>
 
 	 <build>

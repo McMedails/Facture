@@ -1,7 +1,9 @@
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Locale.Category;
 import java.io.*;
 import java.awt.*;
@@ -11,6 +13,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -18,10 +21,17 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.CategoryPlot;
+import com.toedter.calendar.JDateChooser;
 
 
 public class Facture
 {
+
+    // Variable de lecture du .txt
+    public static String line;
+    // Données pour graphique
+    public static DefaultCategoryDataset _defaultDataset = new DefaultCategoryDataset();
+
     // Vérificateur de chiffre dans JTextField
     public static boolean isValidDouble(String text)
     {   
@@ -34,11 +44,6 @@ public class Facture
             return false; 
         } 
     }
-
-    // Variable de lecture du .txt
-    public static String line;
-    // Données pour graphique
-    public static DefaultCategoryDataset _defaultDataset = new DefaultCategoryDataset();
 
     public static void main (String[]args)
     {
@@ -87,22 +92,23 @@ public class Facture
         String _months[] = {"", "Janvier", "Février", "Mars", "Avril", 
                             "Mai", "Juin", "Juillet", "Août", "Septembre", 
                             "Octobre", "Novembre", "Décembre"};
+        
 
         /************************************************************ 
                            Onglet : Mensuel 
         *************************************************************/
 
-        /************************** Impôts **************************/
+        /************************** Facture **************************/
 
-        // Impôts
-        JLabel _labImpots = new JLabel("<html><u>Impôts</u></html>");
-        Font _fontImpots = new Font("Arial", Font.BOLD, 18);
-        _labImpots.setFont(_fontImpots);
+        // Facture
+        JLabel _labFacture = new JLabel("<html><u>Facture</u></html>");
+        Font _fontFacture = new Font("Arial", Font.BOLD, 18);
+        _labFacture.setFont(_fontFacture);
         _gbc.gridwidth = 1;
         _gbc.gridx = 0;
         _gbc.gridy = 0;       
-        _pan1.add(_labImpots, _gbc);
-
+        _pan1.add(_labFacture, _gbc);
+    
         // A1 - Années
         JLabel _labYears = new JLabel("Année");
         _gbc.gridx = 0;
@@ -127,11 +133,16 @@ public class Facture
         _gbc.gridy = 2;
         _pan1.add(_boxMonths, _gbc); 
 
-        // A3 - RAZ
-        JButton _btReset1 = new JButton("RAZ");
+        // A3 - Date de paiement
+        JLabel _labPay = new JLabel("Date de Paiement");
+        _gbc.gridx = 2;
+        _gbc.gridy = 1;
+        _pan1.add(_labPay, _gbc);
+        JDateChooser _datePay = new JDateChooser();
+        _datePay.setPreferredSize(new Dimension(100, 18));
         _gbc.gridx = 2;
         _gbc.gridy = 2;
-        _pan1.add(_btReset1, _gbc);
+        _pan1.add(_datePay, _gbc);
 
         // B1 - Jours travaillés
         JLabel _labDays = new JLabel("Jours travaillés");
@@ -311,37 +322,42 @@ public class Facture
         _boxPDF2.setEnabled(true);
         _gbc.gridx = 0;
         _gbc.gridy = 24;
-        _gbc.gridwidth = 3;
         _pan1.add(_boxPDF2, _gbc); 
 
         /************************ Enregistrer ************************/
 
         // I1 - Enregistrer
         JButton _btSave = new JButton("Enregistrer");
+        _gbc.gridwidth = 2;
+        _gbc.gridx = 0;
+        _gbc.gridy = 25;
+        _pan1.add(_btSave, _gbc);
+
+        // I2 - RAZ
+        JButton _btReset1 = new JButton("RAZ");
         _gbc.gridx = 1;
         _gbc.gridy = 25;
-        _gbc.gridwidth = 1;
-        _pan1.add(_btSave, _gbc);
+        _pan1.add(_btReset1, _gbc);
 
         /************************************************************ 
                            Onglet : Annuel 
         *************************************************************/
 
-        /************************* Impôts **************************/
+        /************************* Facture **************************/
 
-        JLabel _labTotalImpots = new JLabel("<html><u>Impôts</u></html>");
+        JLabel _labTotalFacture = new JLabel("<html><u>Facture</u></html>");
         Font _fontTotal = new Font("Arial", Font.BOLD, 18);
-        _labTotalImpots.setFont(_fontTotal);
+        _labTotalFacture.setFont(_fontTotal);
         _gbc.gridwidth = 1;
         _gbc.gridx = 0;
         _gbc.gridy = 1;       
-        _pan2.add(_labTotalImpots, _gbc);
+        _pan2.add(_labTotalFacture, _gbc);
 
         // A2 - Résultat Total TTC
-        JLabel _labTotalImpotsTTC = new JLabel("Total TTC");
+        JLabel _labTotalFactureTTC = new JLabel("Total TTC");
         _gbc.gridx = 0;
         _gbc.gridy = 2;   
-        _pan2.add(_labTotalImpotsTTC, _gbc);
+        _pan2.add(_labTotalFactureTTC, _gbc);
         JTextField _txtTotalTTC = new JTextField();
         _txtTotalTTC.setPreferredSize(new Dimension(60, 18));
         _txtTotalTTC.setEnabled(true);
@@ -350,10 +366,10 @@ public class Facture
         _pan2.add(_txtTotalTTC, _gbc); 
 
         // A1 - Résultat Total HT
-        JLabel _labTotalImpotsHT = new JLabel("Total HT");
+        JLabel _labTotalFactureHT = new JLabel("Total HT");
         _gbc.gridx = 1;
         _gbc.gridy = 2;   
-        _pan2.add(_labTotalImpotsHT, _gbc);
+        _pan2.add(_labTotalFactureHT, _gbc);
         JTextField _txtTotalHT = new JTextField();
         _txtTotalHT.setPreferredSize(new Dimension(60, 18));
         _txtTotalHT.setEnabled(true);
@@ -382,10 +398,10 @@ public class Facture
         _pan2.add(_labTotalUrssaf, _gbc);
 
         // B1 - Taxe Total
-        JLabel _labTotalImpotsTaxeUrssaf = new JLabel("Total taxe");
+        JLabel _labTotalFactureTaxeUrssaf = new JLabel("Total taxe");
         _gbc.gridx = 0;
         _gbc.gridy = 5;   
-        _pan2.add(_labTotalImpotsTaxeUrssaf, _gbc);
+        _pan2.add(_labTotalFactureTaxeUrssaf, _gbc);
         JTextField _txtTotalTaxeUrssaf = new JTextField();
         _txtTotalTaxeUrssaf.setPreferredSize(new Dimension(60, 18));
         _txtTotalTaxeUrssaf.setEnabled(true);       
@@ -394,10 +410,10 @@ public class Facture
         _pan2.add(_txtTotalTaxeUrssaf, _gbc);
 
         // B2 - Différence Total 
-        JLabel _labTotalImpotsTaxe = new JLabel("Total différence");
+        JLabel _labTotalFactureTaxe = new JLabel("Total différence");
         _gbc.gridx = 1;
         _gbc.gridy = 5;   
-        _pan2.add(_labTotalImpotsTaxe, _gbc);
+        _pan2.add(_labTotalFactureTaxe, _gbc);
         JTextField _txtTotalTaxe = new JTextField();
         _txtTotalTaxe.setPreferredSize(new Dimension(60, 18));
         _txtTotalTaxe.setEnabled(true); 
@@ -515,6 +531,7 @@ public class Facture
             {
                     /* A1 */ _boxYears.setSelectedItem("");
                     /* A2 */ _boxMonths.setSelectedItem("");
+                    /* A3 */ _datePay.setDate(null); 
                     /* B1 */ _txtDays.setText("");  
                     /* B2 */ _txtTJM.setText("");
                     /* C1 */ _txtTTC.setText("");
@@ -561,7 +578,7 @@ public class Facture
                 _TTC1 = _HT1 * 1.2;
                 _TVA1 = _TTC1 - _HT1;
 
-                //____ Calcule Impôts (HT + TTC) ___\
+                //____ Calcule Facture (HT + TTC) ___\
                 if (! _txtDays.getText().isEmpty() && ! _txtTJM.getText().isEmpty())
                 {
                     String _HT1String = Double.toString(_HT1);
@@ -619,9 +636,12 @@ public class Facture
             {
                 String _filePath = System.getProperty("user.dir") + File.separator +("Facture.txt");
                 File _file = new File(_filePath);
+                Date _getPay = _datePay.getDate();
+                SimpleDateFormat _dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.FRENCH);
 
                 /* A1 */  String _slctYears = (String)           "Année --> " + _boxYears.getSelectedItem();
                 /* A2 */  String _slctMonths = (String)          "Mois --> " + _boxMonths.getSelectedItem();
+                /* A3 */  String _slctPay = (String)             "Versement --> " + _dateFormat.format(_getPay);
                 /* B1 */  String _slctDays = (String)            "Jours --> " + _txtDays.getText();
                 /* B2 */  String _slctTJM = (String)             "TJM --> " + _txtTJM.getText();
                 /* C1 */  String _slctTTC = (String)             "TTC --> " + _txtTTC.getText();
@@ -663,6 +683,7 @@ public class Facture
                             Files.write(Paths.get(_filePath),
                             ( /* A1 */ _slctYears + System.lineSeparator() +
                               /* A2 */ _slctMonths + System.lineSeparator() +
+                              /* A3 */ _slctPay + System.lineSeparator() +
                               /* B1 */ _slctDays + System.lineSeparator() +
                               /* B2 */ _slctTJM + System.lineSeparator() +
                               /* C1 */ _slctTTC + System.lineSeparator() +
@@ -706,6 +727,7 @@ public class Facture
             {
                 // Vérification si année de sélection vide
                 String selectedYear = (String) _boxYearsTotal.getSelectedItem();
+
                 if (selectedYear.isEmpty()) 
                 {
                     /* A1 */ _txtTotalHT.setText("");  
@@ -725,9 +747,9 @@ public class Facture
                 Double _ii = 0.0;
                 Double _jj = 0.0;
                 Double[] _graphTotauxHT = new Double[12];
-                String[] _graphMonths = {"Janvier", "Février", "Mars", "Avril", 
-                                         "Mai", "Juin", "Juillet", "Août", "Septembre", 
-                                         "Octobre", "Novembre", "Décembre"};
+                String[] _graphMonths = {"janvier", "février", "mars", "avril", 
+                                         "mai", "juin", "juillet", "août", "septembre", 
+                                         "octobre", "novembre", "décembre"};
 
                 /************************************************************ 
                                         LECTURE .TXT
@@ -738,7 +760,7 @@ public class Facture
                     while ((line = reader.readLine()) != null) 
                     {
                         // Ligne vide, on arrête
-                        if (line.trim().isEmpty()) 
+                        if (line.trim().isEmpty())
                         {
                             break;
                         }
@@ -747,74 +769,68 @@ public class Facture
                                                  CALCULES
                         *************************************************************/
 
-                        // Détection début de l'année sélectionnée
-                        if (line.contains("Année --> " + selectedYear)) 
+                        if (line.contains("Versement --> "))
                         {
-                            _currentYear = true;  
-                            // Année 2024 (ACRE)
-                            if (line.contains("Année --> 2024")) 
+                            // Détection début de l'année sélectionnée
+                            if (line.contains(selectedYear))
                             {
-                                _acre2024 = true;
-                                _acre2025 = false;
-                                continue;
+                                _currentYear = true;
+
+                                // Année 2024 (ACRE)
+                                if (line.contains("2024")) 
+                                {
+                                    _acre2024 = true;
+                                    _acre2025 = false; 
+                                }
+                                // Année 2025 (ACRE)
+                                else if (line.contains("2025"))
+                                {
+                                    // Vérification mois (ACRE) 
+                                    if ((line.contains("janvier") ||
+                                        line.contains("février") ||
+                                        line.contains("mars") ||
+                                        line.contains("avril"))) 
+                                        { _ii++; }
+                                    if ((line.contains("mai") ||
+                                        line.contains("juin") ||
+                                        line.contains("juillet") ||
+                                        line.contains("août") || 
+                                        line.contains("septembre") || 
+                                        line.contains("octobre") || 
+                                        line.contains("novembre") || 
+                                        line.contains("décembre"))) 
+                                        { _jj++; }
+                                        
+                                    _acre2024 = false;
+                                    _acre2025 = true;
+                                }
+                                // Année sans ACRE
+                                else
+                                {
+                                    _acre2024 = false;
+                                    _acre2025 = false;
+                                } 
                             }
-                            // Année 2025 (ACRE)
-                            else if (line.contains("Année --> 2025"))
-                            {
-                                _acre2024 = false;
-                                _acre2025 = true;
-                                continue;
-                            }
-                             // Année sans ACRE
                             else
                             {
-                                _acre2024 = false;
-                                _acre2025 = false;
                                 continue;
-                            }                                          
+                            }  
+                        
+                            // Chercher le mois du versement
+                            String _monthPart = line.substring(line.indexOf("Versement --> ") + 17).trim();
+                            int _firstSpaceIndex = _monthPart.indexOf(" ");
+                            if (_firstSpaceIndex != -1)
+                            {
+                                _currentMonth = _monthPart.substring(0, _firstSpaceIndex).trim();  
+                            }
                         }
                         
-                        // Vérification 2025 (ACRE) 
-                        if ( _acre2025)
-                            {
-                                if ((line.contains("Mois --> Janvier") ||
-                                     line.contains("Mois --> Février") ||
-                                     line.contains("Mois --> Mars") ||
-                                     line.contains("Mois --> Avril"))) 
-                                     {
-                                        _ii++;
-                                     }
-                                if ((line.contains("Mois --> Mai") ||
-                                     line.contains("Mois --> Juin") ||
-                                     line.contains("Mois --> Juillet") ||
-                                     line.contains("Mois --> Août") || 
-                                     line.contains("Mois --> Septembre") || 
-                                     line.contains("Mois --> Octobre") || 
-                                     line.contains("Mois --> Novembre") || 
-                                     line.contains("Mois --> Décembre"))) 
-                                    {
-                                        _jj++;
-                                    }
-                            }
-  
-                        // Chercher le mois
-                        if (line.contains("Mois --> ")) 
-                        {   
-                            _currentMonth = line.substring(line.indexOf("Mois --> ") + 9).trim();
-                        }
-
-                        // Détection d'une autre année, on arrête si on était dans notre année
-                        if (line.contains("Année --> ") && _currentYear) 
-                        {
-                            break;
-                        }
-
                         /************************* CALCULES **************************/  
 
                         // Si on est dans la bonne année, on additionne les HT
                         if (_currentYear && line.contains("HT --> ")) 
                         {
-                            //____ Calcule Impôts (HT + TTC) ___\
+                            //____ Calcule Facture (HT + TTC) ___\
                             String _convTotalHT = line.substring(line.indexOf("HT --> ") + 7).trim();
                             _totalHT += Double.parseDouble(_convTotalHT); 
                             // Caclul TVA
@@ -846,6 +862,13 @@ public class Facture
                                     _totalUrssaf = _totalHT * ((2.2 + 24.6 + 0.2) / 100);
                                 }
 
+                                // Résultat de calcul
+                                _totalTaxe = _totalHT - _totalUrssaf;
+                                String _resultUrssaf = String.format("%.1f", _totalUrssaf);
+                                String _resultTaxe = String.format("%.1f", _totalTaxe);
+                                _txtTotalTaxeUrssaf.setText(_resultUrssaf);
+                                _txtTotalTaxe.setText(_resultTaxe);
+ 
                                 /************************* GRAPHIQUE **************************/ 
 
                                 try 
@@ -859,25 +882,23 @@ public class Facture
     
                                 if (_currentMonth != null && _currentHT != null) 
                                 {
-                                    // Trouver le mois correspondant et stocker la valeur HT
+                                    // Trouve le mois correspondant et stocke la valeur HT dans le tableau
                                     for (int ii = 0; ii < _graphMonths.length; ii++) 
                                     {
-                                        if (_graphMonths[ii].equalsIgnoreCase(_currentMonth)) 
+                                        if (_graphMonths[ii].equals(_currentMonth)) 
                                         {
                                             _graphTotauxHT[ii] = _currentHT;
-                                            break; 
+                                            System.out.println(_graphTotauxHT[ii]); 
+                                        }
+                                        else
+                                        {
+                                            _graphTotauxHT[ii] = 0.0;
+                                            System.out.println(_graphTotauxHT[ii]);
                                         }
                                     }
                                 }
 
-                                // Résultat de calcul
-                                _totalTaxe = _totalHT - _totalUrssaf;
-                                String _resultUrssaf = String.format("%.1f", _totalUrssaf);
-                                String _resultTaxe = String.format("%.1f", _totalTaxe);
-                                _txtTotalTaxeUrssaf.setText(_resultUrssaf);
-                                _txtTotalTaxe.setText(_resultTaxe);
-
-                                // Réinitialiser pour le prochain mois
+                                // Réinitialise pour le prochain mois
                                 _currentMonth = null;
                                 _currentHT = null;
                         }  
@@ -917,10 +938,10 @@ public class Facture
                 catch (IOException ex) 
                 {
                     JOptionPane.showMessageDialog(null, 
-                        "Erreur lors du calcul : " + ex.getMessage(),
-                        "Erreur", 
-                        JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
+                    "Erreur lors du calcul : " + ex.getMessage(),
+                    "Erreur", 
+                    JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
                 }
             }
         });
@@ -944,9 +965,9 @@ public class Facture
         *************************************************************/
 
         // Création du graphique à barres
-        JFreeChart _chart = ChartFactory.createBarChart("Résultats",     /* Titre du graphique */
+        JFreeChart _chart = ChartFactory.createBarChart(null,            /* Titre du graphique */
                                                         null,            /* Axe des abscisses */ 
-                                                        null,            /* Axe des ordonnées */  
+                                                        "Résultats",     /* Axe des ordonnées */  
                             _defaultDataset, PlotOrientation.HORIZONTAL, true,   /*Légende */ 
                                                                          true,   /*Info tooltips */ 
                                                                          false); /* URL */
