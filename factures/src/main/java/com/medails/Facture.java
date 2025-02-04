@@ -888,12 +888,6 @@ public class Facture
                                         if (_graphMonths[ii].equals(_currentMonth)) 
                                         {
                                             _graphTotauxHT[ii] = _currentHT;
-                                            System.out.println(_graphTotauxHT[ii]); 
-                                        }
-                                        else
-                                        {
-                                            _graphTotauxHT[ii] = 0.0;
-                                            System.out.println(_graphTotauxHT[ii]);
                                         }
                                     }
                                 }
@@ -912,6 +906,10 @@ public class Facture
                             if (_graphTotauxHT[ii] != null)
                             {
                                 _defaultDataset.addValue(_graphTotauxHT[ii], "Hors Taxe", _graphMonths[ii]);
+                            }
+                            else
+                            {
+                                _graphTotauxHT[ii] = 0.0;
                             }
                         }    
                     }
