@@ -1,3 +1,5 @@
+package com.medails;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -93,15 +95,21 @@ public class Facture
                                  DONNEES 
          ***********************************************************/
 
+        // Chemin d'accès du fichier
+        String filePath = Reader.filePath;
+
+        // Création du fichier
+        File mainFile = new File(Reader.filePath);
+
+        // Contenu du fichier
+        List<String> lines = Reader.read(filePath);
+
         // Année et mois
         String _years[] = {"", "2024", "2025", "2026", "2027", "2028"};
         String _months[] = {"", "Janvier", "Février", "Mars", "Avril", 
                             "Mai", "Juin", "Juillet", "Août", "Septembre", 
                             "Octobre", "Novembre", "Décembre"};
-    
-        // Nom du fichier BDD
-        File _mainFile = new File("Facture.txt");
-        
+            
         // Données pour graphique
         DefaultCategoryDataset _dataYears = new DefaultCategoryDataset();
         DefaultCategoryDataset _dataMonths = new DefaultCategoryDataset();
@@ -283,10 +291,19 @@ public class Facture
         _gbc.gridy = 19;
         _gbc.gridwidth = 1; 
         _pan1.add(_btSearchFacture, _gbc);
+        // Renseignement du répertoire -> Facture
+        JButton _btRep1 = new JButton("...");
+        _btRep1.setPreferredSize(new Dimension(20,18));
+        _gbc.insets = new Insets(0, 0, 10, 330);
+        _gbc.gridx = 0;
+        _gbc.gridy = 20;  
+        _gbc.gridwidth = 3;  
+        _pan1.add(_btRep1, _gbc);
         // Barre de recherche Facture (Réperoitre)
         JComboBox<String> _boxRep1 = new JComboBox<>();
         _boxRep1.setPreferredSize(new Dimension(300, 18));
         _boxRep1.setEnabled(true);
+        _gbc.insets = new Insets(0, 10, 10, 10);
         _gbc.gridx = 0;
         _gbc.gridy = 20;
         _gbc.gridwidth = 3;
@@ -320,10 +337,19 @@ public class Facture
         _gbc.gridy = 22;
         _gbc.gridwidth = 1; 
         _pan1.add(_btSearchDecla, _gbc);
+        // Renseignement du répertoire -> Déclaration
+        JButton _btPDF1 = new JButton("...");
+        _btPDF1.setPreferredSize(new Dimension(20,18));
+        _gbc.insets = new Insets(0, 0, 10, 330);
+        _gbc.gridx = 0;
+        _gbc.gridy = 23;  
+        _gbc.gridwidth = 3;  
+        _pan1.add(_btPDF1, _gbc);
         // Barre de recherche Déclaration (Réperoitre)
         JComboBox<String> _boxRep2 = new JComboBox<>();
         _boxRep2.setPreferredSize(new Dimension(300, 18));
         _boxRep2.setEnabled(true);
+        _gbc.insets = new Insets(0, 10, 10, 10);
         _gbc.gridx = 0;
         _gbc.gridy = 23;
         _gbc.gridwidth = 3; 
@@ -534,6 +560,104 @@ public class Facture
             }   
         });
 
+        /************************* FENETRE ... **************************/
+
+        // Création de la fenêtre
+        JFrame _fenRep1 = new JFrame("Répertoire Facture par défaut");
+        _fenRep1.setSize(380, 130);
+        _fenRep1.setLocationRelativeTo(null);
+        _fenRep1.setResizable(false);
+
+        // Création du panneau
+        JPanel _panRep1 = new JPanel();
+        _panRep1.setBackground(Color.LIGHT_GRAY);
+        _fenRep1.setContentPane(_panRep1);
+        _panRep1.setLayout(new GridBagLayout()); 
+
+        // Placement des composants
+        GridBagConstraints _gbcRep1 = new GridBagConstraints();
+        _gbcRep1.insets = new Insets(0, 10, 10, 10);
+
+        // Création et gestion du contenu
+        JTextField _txtRep1 = new JTextField();
+        _txtRep1.setPreferredSize(new Dimension(300, 18));
+        _gbcRep1.gridwidth = 2;
+        _gbcRep1.gridx = 0;
+        _gbcRep1.gridy = 0;
+        _panRep1.add(_txtRep1, _gbcRep1);          
+        JButton _btValid = new JButton("Valider");
+        _gbcRep1.gridwidth = 1;
+        _gbcRep1.gridx = 1;
+        _gbcRep1.gridy = 1;
+        _panRep1.add(_btValid, _gbcRep1);  
+
+        // Facture -> Répertoire par défaut ...
+        _btRep1.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                // Affichage de la fenêtre
+                _fenRep1.setVisible(true);
+
+                // Enregistrement du répertoire Facture par défaut
+                _btValid.addActionListener(new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        if (_txtRep1.getText() != null)
+                        {
+                            try 
+                            {
+                                List<String> _listLine = Files.readAllLines(Paths.get(filePath));
+
+                                // Vérification de l'existence du fichier
+                                if (!mainFile.exists())
+                                {
+                                    mainFile.createNewFile();
+                                }
+                                
+                                // Vérifie si le champ de saisie est vide
+                                if (!_txtRep1.getText().isEmpty())
+                                {
+                                    // Vérifie si un répértoire existe déjà
+                                    if (!_listLine.contains("Directory Facture --> "))
+                                    {
+                                        _listLine.remove(0);
+                                    }
+
+                                    // Ajoute la ligne en début de liste 
+                                    _listLine.add(0, "Directory Facture --> " + _txtRep1.getText());
+
+                                    // Ajoute la ligne dans le fichier
+                                    Files.write(Paths.get(filePath), 
+                                    _listLine, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+                                    JOptionPane.showMessageDialog(null, "Le répertoire facture a bien été enregistré",
+                                    "Enregistrement", JOptionPane.INFORMATION_MESSAGE);
+
+                                    // Fermeture de la fenêtre après validation
+                                    _fenRep1.dispose();
+                                }
+                                else
+                                {
+                                    JOptionPane.showMessageDialog(null, "Veuillez compléter le champ de saisie avant de valider",
+                                                                    "Champ vide", JOptionPane.INFORMATION_MESSAGE);
+
+                                    // Fermeture de la fenêtre après réponse au message box
+                                    _fenRep1.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                                }
+                            }
+                            catch (IOException ex)
+                            {
+                            ex.printStackTrace();
+                            } 
+                        }
+                    }
+                });
+            }
+        });
+
         // Utilisation de Sets pour éviter les doublons
         Set<String> _setRep1 = new HashSet<>();
         Set<String> _setPDF1 = new HashSet<>();
@@ -544,11 +668,11 @@ public class Facture
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) 
             {
-                if (!_mainFile.exists()) 
+                if (!mainFile.exists()) 
                 {
                     try 
                     {
-                        _mainFile.createNewFile();
+                        mainFile.createNewFile();
                     } 
                     catch (IOException ex) 
                     {
@@ -557,11 +681,8 @@ public class Facture
                     return;
                 }
 
-                try 
+                for (String line : lines)
                 {
-                    BufferedReader reader = new BufferedReader(new FileReader(_mainFile));
-                    String line;
-
                     // Vide les Sets
                     _setRep1.clear();
                     _setPDF1.clear();
@@ -570,7 +691,7 @@ public class Facture
                     ArrayList<String> _arrayRep1 = new ArrayList<>();
                     ArrayList<String> _arrayPDF1 = new ArrayList<>();
 
-                    while ((line = reader.readLine()) != null) 
+                    while (line != null) 
                     {
                         if (line.contains("01 - Professionnelle"))
                         {
@@ -591,7 +712,6 @@ public class Facture
                             }
                         }
                     }
-                    reader.close();
 
                     // Tri des listes par ordre alphabétique
                     Collections.sort(_arrayRep1);
@@ -610,10 +730,6 @@ public class Facture
                     {
                         _boxPDF1.addItem(_getPDF1);
                     }
-                } 
-                catch (IOException ex) 
-                {
-                    ex.printStackTrace();
                 }
             }
 
@@ -691,11 +807,11 @@ public class Facture
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) 
             {
-                if (!_mainFile.exists()) 
+                if (!mainFile.exists()) 
                 {
                     try 
                     {
-                        _mainFile.createNewFile();
+                        mainFile.createNewFile();
                     } 
                     catch (IOException ex) 
                     {
@@ -704,11 +820,8 @@ public class Facture
                     return;
                 }
 
-                try 
+                for (String line : lines)
                 {
-                    BufferedReader reader = new BufferedReader(new FileReader(_mainFile));
-                    String line;
-
                     // Vide les Sets
                     _setRep2.clear();
                     _setPDF2.clear();
@@ -717,7 +830,7 @@ public class Facture
                     ArrayList<String> _arrayRep2 = new ArrayList<>();
                     ArrayList<String> _arrayPDF2 = new ArrayList<>();
 
-                    while ((line = reader.readLine()) != null) 
+                    while (line != null) 
                     {
                         if (line.contains("00 - Gouvernement"))
                         {
@@ -738,7 +851,6 @@ public class Facture
                             }
                         }
                     }
-                    reader.close();
 
                     // Tri des listes par ordre alphabétique
                     Collections.sort(_arrayRep2);
@@ -758,10 +870,6 @@ public class Facture
                         _boxPDF2.addItem(_getPDF2);
                     }
                 } 
-                catch (IOException ex) 
-                {
-                    ex.printStackTrace();
-                }
             }
 
             @Override
@@ -885,8 +993,6 @@ public class Facture
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                String _filePath = System.getProperty("user.dir") + File.separator +("Facture.txt");
-                File _file = new File(_filePath);
                 Date _getPay = _datePay.getDate();
                 SimpleDateFormat _dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.FRENCH);
 
@@ -919,19 +1025,18 @@ public class Facture
                     try
                     {
                         // Vérification de l'existence du fichier
-                        if (!_file.exists())
+                        if (!mainFile.exists())
                         {
-                            _file.createNewFile();
+                            mainFile.createNewFile();
                         }
 
-                        // Vérifier si la ligne existe déjà dans le fichier
-                        List<String> _lines = Files.readAllLines(Paths.get(_filePath));
+                        List<String> _listLine = Files.readAllLines(Paths.get(filePath));
 
                         // Si la ligne n'existe pas déjà, on l'ajoute
-                        if (! _lines.contains(_slctFacturePDF))
+                        if (! _listLine.contains(_slctFacturePDF))
                         {
                             // Ajoute la ligne dans le fichier
-                            Files.write(Paths.get(_filePath),
+                            Files.write(Paths.get(filePath),
                             ( /* A1 */ _slctYears + System.lineSeparator() +
                               /* A2 */ _slctMonths + System.lineSeparator() +
                               /* A3 */ _slctPay + System.lineSeparator() +
@@ -1018,10 +1123,9 @@ public class Facture
                                         LECTURE .TXT
                 *************************************************************/
 
-                try (BufferedReader reader = new BufferedReader(new FileReader("Facture.txt"))) 
+                for (String line : lines)
                 {
-                    String line;
-                    while ((line = reader.readLine()) != null) 
+                    while (line != null) 
                     {
                         // Ligne vide, on arrête
                         if (line.trim().isEmpty()) 
@@ -1284,14 +1388,6 @@ public class Facture
                         /* B2 */ _txtTotalTaxe.setText("");           
                         return;
                     }           
-                }
-                catch (IOException ex) 
-                {
-                    JOptionPane.showMessageDialog(null, 
-                    "Erreur lors du calcul : " + ex.getMessage(),
-                    "Erreur", 
-                    JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
                 }
             }
         });

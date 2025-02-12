@@ -1,4 +1,4 @@
-Année --> 2024
+Directory Facture --> M://Multimédia/Bureau/Social/Social - Pc Bureau/01 - Professionnelle/Factures
 Mois --> Mai
 Versement --> 04 juillet 2024
 Jours --> 18
@@ -53,21 +53,6 @@ HT --> 5800.0
 TVA --> 1160.0
 Urssaf --> 812,0
 Restant --> 4988.0
-M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
-Facture KLIPER - 12.2024.pdf
-M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
-Déclaration 01.2025.pdf
-<->
-Année --> 2025
-Mois --> Février
-Versement --> 15 mars 2026
-Jours --> 19
-TJM --> 400
-TTC --> 9120.0
-HT --> 7600.0
-TVA --> 1520.0
-Urssaf --> 1064,0
-Restant --> 6536.0
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
 Facture KLIPER - 12.2024.pdf
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
