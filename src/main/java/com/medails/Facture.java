@@ -2,7 +2,6 @@ package com.medails;
 
 import javax.swing.SwingUtilities;
 
-
 public class Facture
 {    
                          
@@ -14,9 +13,10 @@ public class Facture
             @Override
             public void run()
             {
-                new Display();
-                new Treatment();
-                new Graphic();
+                Display display = new Display();
+                Graphic graphic = new Graphic(display);
+                display.setGraphic(graphic);
+                Treatment treatment = new Treatment(display, graphic);
             }
         });
     }

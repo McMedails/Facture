@@ -28,18 +28,12 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.jfree.chart.ChartPanel;
-
-import com.medails.Display;
-import com.medails.Graphic;
-
     /************************************************************ 
                         TRAITEMENT DE DONNEES
     *************************************************************/
 
 public class Treatment
 {
-
     // Vérificateur de chiffre dans JTextField
     public static boolean isValidDouble(String text)
     {   
@@ -76,14 +70,28 @@ public class Treatment
 
     public static Double[][][][] _graphTotauxYears = new Double[12][12][12][12];
     public static Double[][][][] _graphTotauxMonths = new Double[12][12][12][12];
-    public static boolean _startGraphic = false;
 
-    public Treatment()
+    private Display display;
+    private Graphic graphic;
+
+    public Treatment(Display display, Graphic graphic)
     {
+        System.out.println("Ordre de traitement : 3");
+
+        this.display = display;
+        this.graphic = graphic;
+        
+        graphic.updateDatasets(_graphTotauxYears, _graphTotauxMonths);
+        display.setupListeners();       
+        initListeners();
+    }
+
         /************************************************************ 
                              Onglet : Enrengistrement 
         *************************************************************/
 
+    private void initListeners()
+    {
         // Vérification cellule non-vide : Jours travaillés
         Display.txtDays.addFocusListener(new FocusAdapter()
         {
@@ -878,7 +886,6 @@ public class Treatment
                             _currentHT = null;
                             _currentTaxe = null;
                             _currentUrssaf = null;
-                            _startGraphic = true;
                         }  
                     }                        
                         

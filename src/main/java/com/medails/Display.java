@@ -70,21 +70,28 @@ public class Display
     private JScrollPane scroll1;
     private JScrollPane scroll2;
     private GridBagConstraints gbc;
-    private GridBagConstraints gbcRep1;
     private JTabbedPane tabMain;
     private JTabbedPane tabGraph;
     private Font styleFont1 = new Font("Arial", Font.BOLD, 18);
     private Font styleFont2 = new Font("Arial", Font.BOLD, 16);
-
-    private Graphic graphic;
     
+    private Graphic graphic;
+
     public Display()
+    {
+        System.out.println("Ordre de traitement : 1");
+        
+        fenPosition();
+        pan1Position();
+        pan2Position();
+    }
+
+    public void fenPosition()
     {
         // Création Fenetre/Panel
         fen = new JFrame();
         pan1 = new JPanel();
         pan2 = new JPanel();
-
         // Configuration Fenetre/Panel
         fen.setTitle("Gestionnaie de facture");
         fen.setSize(410, 610);
@@ -98,15 +105,8 @@ public class Display
         // Ajout du scroll aux panels
         scroll1 = new JScrollPane(pan1);
         scroll2 = new JScrollPane(pan2);
-        
-        // Configuration des scrolls
         scroll1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        // Placement des composants
-        gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 10, 10, 10);
-
         // Onglets - utiliser les JScrollPane au lieu des JPanel
         tabMain = new JTabbedPane();
         tabMain.add("Enregistrement", scroll1);
@@ -114,10 +114,11 @@ public class Display
         // Ajout des Onglets dans Fenetre
         fen.add(tabMain, BorderLayout.CENTER);
 
-        pan1Position();
-        pan2Position();
-        graphic();
-    //    rep1Position();
+        // Placement des composants
+        gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 10, 10, 10);
+
+        tabGraph = new JTabbedPane();
 
         // Fermeture de la fenetre
         fen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -312,7 +313,7 @@ public class Display
 
 
     public void pan2Position()
-    {
+    { 
         /************************* Facture **************************/
         JLabel labTotalFacture = new JLabel("<html><u>Facture</u></html>");
         addComposant(pan2, labTotalFacture, 0, 1, 1);
@@ -363,44 +364,26 @@ public class Display
         addComposant(pan2, btReset2, 2, 10, 1);     
     }
 
-    public void graphic()
+    public void setGraphic(Graphic graphic)
     {
-        ChartPanel chartPanelYears = graphic.getchartPanelYears();
-        ChartPanel chartPanelMonths = graphic.getchartPanelMonths();
-
-        chartPanelYears.setPreferredSize(new Dimension(340,400));
-        chartPanelMonths.setPreferredSize(new Dimension(340,400));
-
-        tabGraph = new JTabbedPane(); 
-        tabGraph.setTabPlacement(JTabbedPane.BOTTOM);
-        tabGraph.addTab("Annuel", chartPanelYears);
-        tabGraph.addTab("Mensuel", chartPanelMonths);    
-        addComposant(pan2, tabGraph, 0, 0, 3);    
+        this.graphic = graphic;
+        refreshChart(null, null);
     }
 
-    public void rep1Position()
+    public void refreshChart (Double [][][][] yearData, Double [][][][] monthsData)
     {
-        fenRep1 = new JFrame("Répertoire Facture par défaut");
-        fenRep1.setSize(380, 130);
-        fenRep1.setLocationRelativeTo(null);
-        fenRep1.setResizable(false);
+        graphic.updateDatasets(yearData, monthsData);
+        graphic.initGraphic(tabGraph, pan2, gbc);
+    }
 
-        panRep1 = new JPanel();
-        panRep1.setBackground(Color.LIGHT_GRAY);
-        fenRep1.setContentPane(panRep1);
-        panRep1.setLayout(new GridBagLayout());
-
-        gbcRep1 = new GridBagConstraints();
-        gbcRep1.insets = new Insets(0, 10, 10, 10);
-
-        txtRep1 = creaTextField(300, 18);
-        addComposant(panRep1, txtRep1, 2, 0, 1);
-
-        btValid = new JButton("Valider");
-        addComposant(panRep1, btValid, 1, 1, 1);
-
-        fenRep1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        fenRep1.setVisible(true); 
+    public void setupListeners()
+    {
+        boxYearsTotal.addActionListener(e ->
+        {
+            Double[][][][] yearData = Treatment._graphTotauxYears;
+            Double[][][][] monthsData = Treatment._graphTotauxMonths;
+            graphic.updateDatasets(yearData, monthsData);
+        });
     }
 }
                         

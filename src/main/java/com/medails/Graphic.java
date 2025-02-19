@@ -1,6 +1,11 @@
 package com.medails;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -16,33 +21,33 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 public class Graphic
 {
-    private ChartPanel chartPanelYears;
-    private ChartPanel chartPanelMonths;
+    private DefaultCategoryDataset _dataYears = new DefaultCategoryDataset();
+    private DefaultCategoryDataset _dataMonths = new DefaultCategoryDataset();
+    private JFreeChart chartYears;
+    private JFreeChart chartMonths;
 
-    public ChartPanel getchartPanelYears()
+    private Display display;
+
+    public Graphic(Display display)
     {
-        return this.chartPanelYears;
+        System.out.println("Ordre de traitement : 2");
+
+        this.display = display;
+        chartYears = createChart(_dataYears, "Annuel");
+        chartMonths = createChart(_dataMonths, "Mensuel");
     }
 
-    public ChartPanel getchartPanelMonths()
+    public void updateDatasets(Double[][][][] yearData, Double [][][][] monthsData)
     {
-        return this.chartPanelMonths;
-    }
-
-    public Graphic()
-    {
-        DefaultCategoryDataset _dataYears = new DefaultCategoryDataset();
-        DefaultCategoryDataset _dataMonths = new DefaultCategoryDataset();
-
         // Réinitialisation des tableaux
         _dataYears.clear();
         _dataMonths.clear();
 
-        if (Treatment._startGraphic)
+        if (yearData != null && monthsData != null)
         {
             // Remplir le dataset avec les données des mois et des totaux HT
             for (int ii = 0; ii < Treatment._graphMonths.length; ii++)
-            {
+            { 
                 /************************* ANNUEL **************************/
 
                 // Ajouter les valeurs (totaux TTC) au dataset pour chaque mois 
@@ -110,44 +115,54 @@ public class Graphic
                 {
                     _dataMonths.addValue(Treatment._graphTotauxMonths[ii][ii][ii][3], "URSSAF", Treatment._graphMonths[ii]);
                 }
-            }  
-
-            // Création du graphique à barres (Annuel)
-            JFreeChart chartYears = ChartFactory.createBarChart(null,                    /* Titre du graphique */
-                                                                null,                   /* Axe des abscisses */ 
-                                                                "Résultats",           /* Axe des ordonnées */  
-                                _dataYears, PlotOrientation.HORIZONTAL, true,         /*Légende */ 
-                                                                        true,        /*Info tooltips */ 
-                                                                        false);     /* URL */
-        
-            // Création du graphique à barres (Mensuel)  
-            JFreeChart chartMonths = ChartFactory.createBarChart(null,                   /* Titre du graphique */
-                                                                 null,                  /* Axe des abscisses */ 
-                                                                 "Résultats",          /* Axe des ordonnées */  
-                                _dataMonths, PlotOrientation.HORIZONTAL, true,        /*Légende */ 
-                                                                         true,       /*Info tooltips */ 
-                                                                         false);    /* URL */
-        
-            // Personnalisation du graphique (Annuel)
-            CategoryPlot catPlotYears = chartYears.getCategoryPlot();
-            catPlotYears.setDomainGridlinesVisible(true);
-            catPlotYears.setRangeGridlinesVisible(true);
-            catPlotYears.setDomainGridlinePaint(Color.BLACK);
-            catPlotYears.setRangeGridlinePaint(Color.BLACK);
-            NumberAxis rangeAxisYears = (NumberAxis) catPlotYears.getRangeAxis();
-            rangeAxisYears.setRange(0, 10000);
-
-            // Personnalisation du graphique (Mensuel)
-            CategoryPlot catPlotMonths = chartMonths.getCategoryPlot();
-            catPlotMonths.setDomainGridlinesVisible(true);
-            catPlotMonths.setRangeGridlinesVisible(true);
-            catPlotMonths.setDomainGridlinePaint(Color.BLACK);
-            catPlotMonths.setRangeGridlinePaint(Color.BLACK);
-            NumberAxis rangeAxisMonths = (NumberAxis) catPlotMonths.getRangeAxis();
-            rangeAxisMonths.setRange(0, 10000);
-
-            this.chartPanelYears = new ChartPanel(chartYears);
-            this.chartPanelMonths = new ChartPanel(chartMonths);
+            }
         }
+        // Mettre à jour les graphiques avec les nouveaux datasets
+        chartYears.getCategoryPlot().setDataset(_dataYears);
+        chartMonths.getCategoryPlot().setDataset(_dataMonths);
+    }
+        
+    private JFreeChart createChart (DefaultCategoryDataset dataset, String title)
+    {
+        // Création du graphique à barres (Annuel)
+            JFreeChart chart = ChartFactory.createBarChart(null,                 /* Titre du graphique */
+                                                        null,                   /* Axe des abscisses */ 
+                                                        "Résultats",           /* Axe des ordonnées */  
+                        dataset, PlotOrientation.HORIZONTAL, true,            /*Légende */ 
+                                                                true,        /*Info tooltips */ 
+                                                                false);     /* URL */
+
+        // Personnalisation du graphique (Annuel)
+        CategoryPlot plot = chart.getCategoryPlot();
+        plot.setDomainGridlinesVisible(true);
+        plot.setRangeGridlinesVisible(true);
+        plot.setDomainGridlinePaint(Color.BLACK);
+        plot.setRangeGridlinePaint(Color.BLACK);
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setRange(0, 10000);
+        return chart;
+    }
+
+    public ChartPanel[] initChartPanel()
+    {
+        ChartPanel chartPanelYears = new ChartPanel(chartYears);
+        ChartPanel chartPanelMonths = new ChartPanel(chartMonths);
+        chartPanelYears.setPreferredSize(new Dimension(340,400));
+        chartPanelMonths.setPreferredSize(new Dimension(340,400)); 
+        return new ChartPanel[] {chartPanelYears, chartPanelMonths};
+    }
+
+    public void initGraphic (JTabbedPane tabGraph, JPanel pan2, GridBagConstraints gbc)
+    {
+        ChartPanel[] panels = initChartPanel();
+        tabGraph.removeAll();
+        ChartPanel chartPanelYears = panels[0];
+        ChartPanel chartPanelMonths = panels[1];
+        tabGraph.addTab("Annuel", chartPanelYears);
+        tabGraph.addTab("Mensuel", chartPanelMonths);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        pan2.add(tabGraph, gbc);
     }
 }
