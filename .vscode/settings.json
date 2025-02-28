@@ -1,3 +1,7 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.configuration.maven.userSettings": "C:\\path\\to\\your\\settings.xml",
+    "java.configuration.maven.localRepository": "C:\\path\\to\\local\\repository",
+    "maven.executable.path": "C:\\path\\to\\maven\\bin\\mvn",
+    "maven.runOnSave": true
 }

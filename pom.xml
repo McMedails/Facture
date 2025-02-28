@@ -62,7 +62,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>Facture</mainClass>
+							<mainClass>AppFacture</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -95,7 +95,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>com.medails.Facture</mainClass>
+                    <mainClass>com.medails.AppFacture</mainClass>
                 </configuration>
             </plugin>
 			

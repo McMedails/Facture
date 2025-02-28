@@ -21,116 +21,45 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 public class Graphic
 {
-    private DefaultCategoryDataset _dataYears = new DefaultCategoryDataset();
-    private DefaultCategoryDataset _dataMonths = new DefaultCategoryDataset();
+    /************************* Variables d'instance **************************/
+
+    public final String[] GRAPHMONTHS = {"janvier", "février", "mars", "avril", 
+                                                "mai", "juin", "juillet", "août", "septembre", 
+                                                "octobre", "novembre", "décembre"};
+               
+    private final String[] CATEGORIES = {"TTC", "HT", "Restant", "URSSAF"};
+
+    private final int MAXRANGE = 10000;
+    private DefaultCategoryDataset dataYears = new DefaultCategoryDataset();
+    private DefaultCategoryDataset dataMonths = new DefaultCategoryDataset();
     private JFreeChart chartYears;
     private JFreeChart chartMonths;
+    private ChartPanel chartPanelYears;
+    private ChartPanel chartPanelMonths;
 
+    /************* Déclarations Classes ****************/
     private Display display;
-
-    public Graphic(Display display)
+    private Treatment treatment; 
+    
+    /*********** Constructeur ***************/
+    public Graphic (Display display)
     {
-        System.out.println("Ordre de traitement : 2");
-
         this.display = display;
-        chartYears = createChart(_dataYears, "Annuel");
-        chartMonths = createChart(_dataMonths, "Mensuel");
+        chartYears = createChart(dataYears);
+        chartMonths = createChart(dataMonths);
+        initChartPanel();
+        createGraphic(display.tabGraph, display.pan2, display.gbc);
     }
 
-    public void updateDatasets(Double[][][][] yearData, Double [][][][] monthsData)
-    {
-        // Réinitialisation des tableaux
-        _dataYears.clear();
-        _dataMonths.clear();
-
-        if (yearData != null && monthsData != null)
-        {
-            // Remplir le dataset avec les données des mois et des totaux HT
-            for (int ii = 0; ii < Treatment._graphMonths.length; ii++)
-            { 
-                /************************* ANNUEL **************************/
-
-                // Ajouter les valeurs (totaux TTC) au dataset pour chaque mois 
-                if (Treatment._graphTotauxYears[ii][ii][ii][0] != null)
-                {
-                    _dataYears.addValue(Treatment._graphTotauxYears[ii][ii][ii][0], "TTC", Treatment._graphMonths[ii]);
-                }
-                else
-                {
-                    Treatment._graphTotauxYears[ii][ii][ii][0] = 0.0;
-                }
-
-                // Ajouter les valeurs (totaux HT) au dataset pour chaque mois
-                if (Treatment._graphTotauxYears[ii][ii][ii][1] != null)
-                {
-                    _dataYears.addValue(Treatment._graphTotauxYears[ii][ii][ii][1], "HT", Treatment._graphMonths[ii]);
-                }
-                else
-                {
-                    Treatment._graphTotauxYears[ii][ii][ii][1] = 0.0;
-                }
-
-                // Ajouter les valeurs (restant) au dataset pour chaque mois
-                if (Treatment._graphTotauxYears[ii][ii][ii][2] != null)
-                {
-                    _dataYears.addValue(Treatment._graphTotauxYears[ii][ii][ii][2], "Restant", Treatment._graphMonths[ii]);
-                }
-                else
-                {
-                    Treatment._graphTotauxYears[ii][ii][ii][2] = 0.0;
-                }
-
-                // Ajouter les valeurs (Urssaf) au dataset pour chaque mois
-                if (Treatment._graphTotauxYears[ii][ii][ii][3] != null)
-                {
-                    _dataYears.addValue(Treatment._graphTotauxYears[ii][ii][ii][3], "URSSAF", Treatment._graphMonths[ii]);
-                }
-                else
-                {
-                    Treatment._graphTotauxYears[ii][ii][ii][3] = 0.0;
-                }
-
-                /************************* MENSUEL **************************/ 
-
-                // Ajouter les valeurs (totaux TTC) au dataset pour chaque mois 
-                if (Treatment._graphTotauxMonths[ii][ii][ii][0] != null)
-                {
-                    _dataMonths.addValue(Treatment._graphTotauxMonths[ii][ii][ii][0], "TTC", Treatment._graphMonths[ii]);
-                }
-
-                // Ajouter les valeurs (totaux HT) au dataset pour chaque mois 
-                if (Treatment._graphTotauxMonths[ii][ii][ii][1] != null)
-                {
-                    _dataMonths.addValue(Treatment._graphTotauxMonths[ii][ii][ii][1], "HT", Treatment._graphMonths[ii]); 
-                }
-
-                // Ajouter les valeurs (restant) au dataset pour chaque mois 
-                if (Treatment._graphTotauxMonths[ii][ii][ii][2] != null)
-                {
-                    _dataMonths.addValue(Treatment._graphTotauxMonths[ii][ii][ii][2], "Restant", Treatment._graphMonths[ii]);
-                }
-
-                // Ajouter les valeurs (Urssaf) au dataset pour chaque mois 
-                if (Treatment._graphTotauxMonths[ii][ii][ii][3] != null)
-                {
-                    _dataMonths.addValue(Treatment._graphTotauxMonths[ii][ii][ii][3], "URSSAF", Treatment._graphMonths[ii]);
-                }
-            }
-        }
-        // Mettre à jour les graphiques avec les nouveaux datasets
-        chartYears.getCategoryPlot().setDataset(_dataYears);
-        chartMonths.getCategoryPlot().setDataset(_dataMonths);
-    }
-        
-    private JFreeChart createChart (DefaultCategoryDataset dataset, String title)
+    private JFreeChart createChart (DefaultCategoryDataset dataset)
     {
         // Création du graphique à barres (Annuel)
-            JFreeChart chart = ChartFactory.createBarChart(null,                 /* Titre du graphique */
-                                                        null,                   /* Axe des abscisses */ 
-                                                        "Résultats",           /* Axe des ordonnées */  
-                        dataset, PlotOrientation.HORIZONTAL, true,            /*Légende */ 
-                                                                true,        /*Info tooltips */ 
-                                                                false);     /* URL */
+        JFreeChart chart = ChartFactory.createBarChart(null,                 /* Titre du graphique */
+                                                       null,                /* Axe des abscisses */ 
+                                                       "Résultats",        /* Axe des ordonnées */  
+                    dataset, PlotOrientation.HORIZONTAL, true,            /*Légende */ 
+                                                           true,         /*Info tooltips */ 
+                                                            false);     /* URL */
 
         // Personnalisation du graphique (Annuel)
         CategoryPlot plot = chart.getCategoryPlot();
@@ -139,30 +68,76 @@ public class Graphic
         plot.setDomainGridlinePaint(Color.BLACK);
         plot.setRangeGridlinePaint(Color.BLACK);
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setRange(0, 10000);
+        rangeAxis.setRange(0, MAXRANGE);
         return chart;
     }
 
     public ChartPanel[] initChartPanel()
     {
-        ChartPanel chartPanelYears = new ChartPanel(chartYears);
-        ChartPanel chartPanelMonths = new ChartPanel(chartMonths);
+        chartPanelYears = new ChartPanel(chartYears);
+        chartPanelMonths = new ChartPanel(chartMonths);
         chartPanelYears.setPreferredSize(new Dimension(340,400));
         chartPanelMonths.setPreferredSize(new Dimension(340,400)); 
         return new ChartPanel[] {chartPanelYears, chartPanelMonths};
     }
 
-    public void initGraphic (JTabbedPane tabGraph, JPanel pan2, GridBagConstraints gbc)
+    public void createGraphic (JTabbedPane jTabbedPane, JPanel jPanel, GridBagConstraints gbc)
     {
         ChartPanel[] panels = initChartPanel();
-        tabGraph.removeAll();
-        ChartPanel chartPanelYears = panels[0];
-        ChartPanel chartPanelMonths = panels[1];
-        tabGraph.addTab("Annuel", chartPanelYears);
-        tabGraph.addTab("Mensuel", chartPanelMonths);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        pan2.add(tabGraph, gbc);
+        display.tabGraph.setTabPlacement(JTabbedPane.BOTTOM);
+        display.tabGraph.removeAll();
+        chartPanelYears = panels[0];
+        chartPanelMonths = panels[1];
+        display.tabGraph.addTab("Annuel", chartPanelYears);
+        display.tabGraph.addTab("Mensuel", chartPanelMonths);
+        display.gbc.gridx = 0;
+        display.gbc.gridy = 0;
+        display.gbc.gridwidth = 3;
+        display.pan2.add(display.tabGraph, display.gbc);
+    }
+
+    // Initialisation des données graphiques
+    public void clearGraph()
+    {
+        dataYears.clear();
+        dataMonths.clear();
+    }
+
+    public void refreshGraph()
+    {
+        chartPanelYears.revalidate();
+        chartPanelYears.repaint();
+        chartPanelMonths.revalidate();
+        chartPanelMonths.repaint();      
+    }
+
+    public void updateDatasets(Double[][][][] data) 
+    {
+        for (int ii = 0; ii < GRAPHMONTHS.length; ii++) 
+        {   
+            for (int jj = 0; jj < CATEGORIES.length; jj++) 
+            {   
+                // Récupération de la valeur
+                Double valeur = data[ii][ii][ii][jj]; 
+    
+                if (valeur != null) 
+                {
+                    dataYears.addValue(valeur, CATEGORIES[jj], GRAPHMONTHS[ii]);
+                    dataMonths.addValue(valeur, CATEGORIES[jj], GRAPHMONTHS[ii]);
+                }
+                else 
+                {
+                    // Vérifier si la clé existe déjà avant d'appeler getValue()
+                    boolean keyExists = dataYears.getColumnIndex(GRAPHMONTHS[ii]) >= 0 &&
+                                        dataYears.getRowIndex(CATEGORIES[jj]) >= 0;
+    
+                    // Si la clé n'existe pas, ajouter 0
+                    if (!keyExists)  
+                    {
+                        dataYears.addValue(0.0, CATEGORIES[jj], GRAPHMONTHS[ii]);
+                    }
+                }
+            }
+        }
     }
 }
