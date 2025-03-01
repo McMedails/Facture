@@ -24,10 +24,10 @@ public class Graphic
     /************************* Variables d'instance **************************/
 
     public final String[] GRAPHMONTHS = {"janvier", "février", "mars", "avril", 
-                                                "mai", "juin", "juillet", "août", "septembre", 
-                                                "octobre", "novembre", "décembre"};
+                                         "mai", "juin", "juillet", "août", "septembre", 
+                                         "octobre", "novembre", "décembre"};
                
-    private final String[] CATEGORIES = {"TTC", "HT", "Restant", "URSSAF"};
+    private final String[] CATEGORIES = {"TTC", "TVA", "HT", "URSSAF", "Bénéfices"};
 
     private final int MAXRANGE = 10000;
     private DefaultCategoryDataset dataYears = new DefaultCategoryDataset();
@@ -111,14 +111,14 @@ public class Graphic
         chartPanelMonths.repaint();      
     }
 
-    public void updateDatasets(Double[][][][] data) 
+    public void updateDatasets(Double[][][][][] data) 
     {
         for (int ii = 0; ii < GRAPHMONTHS.length; ii++) 
         {   
             for (int jj = 0; jj < CATEGORIES.length; jj++) 
             {   
                 // Récupération de la valeur
-                Double valeur = data[ii][ii][ii][jj]; 
+                Double valeur = data[ii][ii][ii][ii][jj]; 
     
                 if (valeur != null) 
                 {

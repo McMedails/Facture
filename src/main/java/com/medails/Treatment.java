@@ -54,11 +54,11 @@ public class Treatment
     private double TTC1 = 0.0;
     private double HT1 = 0.0;
     private double TVA1 = 0.0;
-    private double TaxeUrssaf1 = 0.0;
     private double Taxe1 = 0.0;
+    private double Benefit1 = 0.0;
 
     // Données pour création graphique
-    public static Double[][][][] graphData = new Double[12][12][12][12];
+    public static Double[][][][][] graphData = new Double[12][12][12][12][12];
 
     /************* Déclarations Classes ****************/
     private Display display;
@@ -164,7 +164,7 @@ public class Treatment
             // Année 2024 (ACRE)
             if (years == "2024")
             {
-                TaxeUrssaf1 = HT1 * ACRE2024;
+                Taxe1 = HT1 * ACRE2024;
             }
 
             // Année 2025 (ACRE)
@@ -174,7 +174,7 @@ public class Treatment
                       months == "Mars" ||
                       months == "Avril")) 
             {
-                TaxeUrssaf1 = HT1 * ACRE2025;
+                Taxe1 = HT1 * ACRE2025;
             }
 
             // Année 2025 (sans ACRE)
@@ -187,23 +187,23 @@ public class Treatment
                       months == "Novembre" ||                    
                       months == "Décembre"))                    
             {
-                TaxeUrssaf1 = HT1 * SANS2025;
+                Taxe1 = HT1 * SANS2025;
             }
 
             // Année 2026 ou plus
             else
             {
-                TaxeUrssaf1 = HT1 * SANS20XX;
+                Taxe1 = HT1 * SANS20XX;
             }              
 
             // Résultat de calcul
-            String decimal = String.format("%.1f", TaxeUrssaf1);
-            display.txtTaxeUrssaf.setText(decimal);
+            String decimal = String.format("%.1f", Taxe1);
+            display.txtTaxe.setText(decimal);
 
             // Calcul URSSAF (Différence)
-            Taxe1 = HT1 - TaxeUrssaf1;
-            String Taxe1String = Double.toString(Taxe1);
-            display.txtTaxe.setText(Taxe1String);
+            Benefit1 = HT1 - Taxe1;
+            String Benefit1toString = Double.toString(Benefit1);
+            display.txtBenefit.setText(Benefit1toString);
         }
         catch (NumberFormatException ex)
         {
@@ -343,8 +343,8 @@ public class Treatment
         /* C1 */  String slctTTC = (String)             "TTC --> " + display.txtTTC.getText();
         /* C2 */  String slctHT = (String)              "HT --> " + display.txtHT.getText();
         /* C3 */  String slctTVA = (String)             "TVA --> " + display.txtTVA.getText();
-        /* D1 */  String slctTaxeUrssaf = (String)      "Urssaf --> " + display.txtTaxeUrssaf.getText();
-        /* D2 */  String slctTaxe = (String)            "Restant --> " + display.txtTaxe.getText(); 
+        /* D2 */  String slctTaxe = (String)            "Taxe --> " + display.txtTaxe.getText(); 
+        /* D1 */  String slctBenefit = (String)         "Benefice --> " + display.txtBenefit.getText();
         /* G1 */  String slctFactureRep = (String)      display.boxRep1.getSelectedItem();
         /* H1 */  String slctFacturePDF = (String)      display.boxPDF1.getSelectedItem();
         /* I1 */  String slctDeclaraRep = (String)      display.boxRep2.getSelectedItem();
@@ -366,7 +366,7 @@ public class Treatment
 
         // Création de la liste des lignes à écrire
         List<String> linesToWrite = Arrays.asList(slctYears, slctMonths, slctPay, slctDays, slctTJM,
-                                                  slctTTC, slctHT, slctTVA, slctTaxeUrssaf, slctTaxe,
+                                                  slctTTC, slctHT, slctTVA, slctTaxe, slctBenefit,
                                                   slctFactureRep, slctFacturePDF, slctDeclaraRep,slctDeclaraPDF, seperator);
 
         // Utilisation de la méthode d'écriture
@@ -387,8 +387,8 @@ public class Treatment
         /* C1 */ display.txtTTC.setText("");
         /* C2 */ display.txtHT.setText("");
         /* C3 */ display.txtTVA.setText("");
-        /* D1 */ display.txtTaxeUrssaf.setText("");
-        /* D2 */ display.txtTaxe.setText("");
+        /* D1 */ display.txtTaxe.setText("");
+        /* D2 */ display.txtBenefit.setText("");
         /* F1 */ display.boxRep1.removeAllItems();
         /* G1 */ display.boxPDF1.removeAllItems();
         /* I1 */ display.boxRep2.removeAllItems();
@@ -407,20 +407,22 @@ public class Treatment
 
         // Initialisation des données
         boolean     monthAcre       = false;
+        boolean     activeYear      = false;
         boolean     acre2024        = false;
         boolean     acre2025        = false;
-        boolean     activeYear      = false;
         String      currentMonth    = null;
         String      currentYear     = null;
         Double      currentHT       = null;
+        Double      currentTVA      = null;
         Double      currentTTC      = null;
         Double      currentTaxe     = null;
-        Double      currentUrssaf   = null;
+        Double      currentBenefit   = null;
         Double      totalHT         = 0.0;
         Double      graphHT         = 0.0;
         Double      graphTTC        = 0.0;
+        Double      graphTVA        = 0.0;
         Double      graphTaxe       = 0.0;
-        Double      graphUrssaf     = 0.0;
+        Double      graphBenefit    = 0.0;
         Double      ii              = 0.0;
         Double      jj              = 0.0;
 
@@ -496,29 +498,30 @@ public class Treatment
                 // Recherche et calcules à partir du montant HT
                 if (activeYear && readFile.line.contains("HT --> ")) 
                 {
-                    // Calcule Facture (HT + TTC) \
+                    // Calcule Facture (HT + TTC) 
                     String convTotalHT = readFile.line.substring(readFile.line.indexOf("HT --> ") + 7).trim();
                     totalHT += Double.parseDouble(convTotalHT); 
                     graphHT = Double.parseDouble(convTotalHT);
-                    graphTTC = Double.parseDouble(convTotalHT) * 1.2;
+                    graphTTC = Double.parseDouble(convTotalHT) * TVA;
+                    graphTVA = graphTTC - graphHT;
 
                     // Caclule TVA
-                    double totalTTC = totalHT * 1.2;
+                    double totalTTC = totalHT * TVA;
                     String convTotalTTC = Double.toString(totalTTC);
                     display.txtTotalTTC.setText(convTotalTTC);
 
                     // Calcule Total URSSAF (Taxe) 
-                    double totalUrssaf = 0.0;
                     double totalTaxe = 0.0;
+                    double totalBenefit = 0.0;
                     double totalii = 0.0;
                     double totaljj = 0.0;
 
                     // Année 2024 (ACRE)
                     if (acre2024) 
                     {
-                        totalUrssaf = totalHT * ACRE2024;
-                        graphUrssaf = graphHT * ACRE2024;
-                        graphTaxe = graphHT - graphUrssaf;
+                        totalTaxe = totalHT * ACRE2024;
+                        graphTaxe = graphHT * ACRE2024;
+                        graphBenefit = graphHT - graphTaxe;
                     }
 
                     // Année 2025 (ACRE avec et sans)
@@ -526,59 +529,62 @@ public class Treatment
                     {
                         totalii = (ii * (totalHT * ACRE2025));
                         totaljj = (jj * (totalHT * SANS2025));
-                        totalUrssaf = (totalii + totaljj) / (ii + jj);
+                        totalTaxe = (totalii + totaljj) / (ii + jj);
                         if(monthAcre)
                         {
-                            graphUrssaf = graphHT * ACRE2025;
-                            graphTaxe = graphHT - graphUrssaf;
+                            graphTaxe = graphHT * ACRE2025;
+                            graphBenefit = graphHT - graphTaxe;
                         }
                         else
                         {
-                            graphUrssaf = graphHT * SANS2025;
-                            graphTaxe = graphHT - graphUrssaf;
+                            graphTaxe = graphHT * SANS2025;
+                            graphBenefit = graphHT - graphTaxe;
                         }
                     }
 
                     // Année 2025 (sans ACRE) ou > 2025
                     if ((!acre2024 && !acre2025)) 
                     {
-                        totalUrssaf = totalHT * SANS20XX;
-                        graphUrssaf = graphHT * SANS20XX;
-                        graphTaxe = graphHT - graphUrssaf;
+                        totalTaxe = totalHT * SANS20XX;
+                        graphTaxe = graphHT * SANS20XX;
+                        graphBenefit = graphHT - graphTaxe;
                     }
 
                     // Résultat des calcules
-                    totalTaxe = totalHT - totalUrssaf;
-                    String resultHT = (String.format("%.1f", totalHT));              
-                    String resultUrssaf = String.format("%.1f", totalUrssaf);
-                    String resultTaxe = String.format("%.1f", totalTaxe);
-                    display.txtTotalHT.setText(resultHT);
-                    display.txtTotalTaxeUrssaf.setText(resultUrssaf);
-                    display.txtTotalTaxe.setText(resultTaxe);
+                    totalBenefit = totalHT - totalTaxe;
+                    String resultatHT = (String.format("%.1f", totalHT));              
+                    String resultatTaxe = String.format("%.1f", totalTaxe);
+                    String resultatBenefit = String.format("%.1f", totalBenefit);
+                    display.txtTotalHT.setText(resultatHT);
+                    display.txtTotalTaxe.setText(resultatTaxe);
+                    display.txtTotalBenefit.setText(resultatBenefit);
 
                     /************************* GRAPHIQUE **************************/ 
 
                     currentTTC = graphTTC;
+                    currentTVA = graphTVA;
                     currentHT = Double.parseDouble(convTotalHT.replace(",", "."));
                     currentTaxe = graphTaxe;
-                    currentUrssaf = graphUrssaf;        
+                    currentBenefit = graphBenefit;        
 
                     // Trouve le mois correspondant et stocke la valeur HT dans le tableau
                     for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++) 
                     {
                         if (graphic.GRAPHMONTHS[kk].equals(currentMonth)) 
                         { 
-                            graphData[kk][kk][kk][0] = currentTTC;          
-                            graphData[kk][kk][kk][1] = currentHT;           
-                            graphData[kk][kk][kk][2] = currentTaxe;          
-                            graphData[kk][kk][kk][3] = currentUrssaf;     
+                            graphData[kk][kk][kk][kk][0] = currentTTC; 
+                            graphData[kk][kk][kk][kk][1] = currentTVA;         
+                            graphData[kk][kk][kk][kk][2] = currentHT;
+                            graphData[kk][kk][kk][kk][3] = currentTaxe; 
+                            graphData[kk][kk][kk][kk][4] = currentBenefit;
                         }
                         else
                         {
-                            graphData[kk][kk][kk][0] = null;    
-                            graphData[kk][kk][kk][1] = null;    
-                            graphData[kk][kk][kk][2] = null;    
-                            graphData[kk][kk][kk][3] = null;   
+                            graphData[kk][kk][kk][kk][0] = null;    
+                            graphData[kk][kk][kk][kk][1] = null;    
+                            graphData[kk][kk][kk][kk][2] = null;    
+                            graphData[kk][kk][kk][kk][3] = null;   
+                            graphData[kk][kk][kk][kk][4] = null;   
                         }
                     }
                     // Renvoie des données calculées vers le graphique
@@ -589,8 +595,9 @@ public class Treatment
                     currentMonth = null;
                     currentTTC = null;
                     currentHT = null;
+                    currentTVA = null;
                     currentTaxe = null;
-                    currentUrssaf = null;
+                    currentBenefit = null;
                 }  
             }                                    
         }
@@ -608,8 +615,8 @@ public class Treatment
         /* A1 */ display.txtTotalHT.setText("");  
         /* A2 */ display.txtTotalTTC.setText("");
         /* A3 */ display.boxYearsTotal.setSelectedItem("");
-        /* B1 */ display.txtTotalTaxeUrssaf.setText("");
-        /* B2 */ display.txtTotalTaxe.setText("");    
+        /* B1 */ display.txtTotalTaxe.setText("");
+        /* B2 */ display.txtTotalBenefit.setText("");    
         graphic.clearGraph();      
     }
 }

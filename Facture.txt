@@ -6,8 +6,8 @@ TJM --> 350
 TTC --> 7560.0
 HT --> 6300.0
 TVA --> 1260.0
-Urssaf --> 882,0
-Restant --> 5418.0
+Taxe --> 882,0
+Benefices --> 5418.0
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
 Facture AD-VANTAGE - 05.2024.pdf
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
@@ -21,8 +21,8 @@ TJM --> 400
 TTC --> 9120.0
 HT --> 7600.0
 TVA --> 1520.0
-Urssaf --> 1064,0
-Restant --> 6536.0
+Taxe --> 1064,0
+Benefices --> 6536.0
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
 Facture KLIPER - 10.2024.pdf
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
@@ -36,8 +36,8 @@ TJM --> 400
 TTC --> 9120.0
 HT --> 7600.0
 TVA --> 1520.0
-Urssaf --> 1064,0
-Restant --> 6536.0
+Taxe --> 1064,0
+Benefices --> 6536.0
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
 Facture KLIPER - 11.2024.pdf
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations
@@ -51,8 +51,8 @@ TJM --> 400
 TTC --> 6960.0
 HT --> 5800.0
 TVA --> 1160.0
-Urssaf --> 812,0
-Restant --> 4988.0
+Taxe --> 812,0
+Benefices --> 4988.0
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\01 - Professionnelle\Factures
 Facture KLIPER - 12.2024.pdf
 M:\Multimédia\Bureau\Social\Social - Pc Bureau\00 - Gouvernement\URSSAF\Déclarations

@@ -47,8 +47,8 @@ public class Display
     public JTextField            txtTTC;                 { txtTTC               = new JTextField        ();}    // C1 - Résultat TTC
     public JTextField            txtHT;                  { txtHT                = new JTextField        ();}    // C2 - Résultat HT
     public JTextField            txtTVA;                 { txtTVA               = new JTextField        ();}    // C3 - Différence TVA  
-    public JTextField            txtTaxeUrssaf;          { txtTaxeUrssaf        = new JTextField        ();}    // D1 - Taxe URSSAF
-    public JTextField            txtTaxe;                { txtTaxe              = new JTextField        ();}    // D2 - Différence Taxe
+    public JTextField            txtTaxe;          { txtTaxe        = new JTextField        ();}    // D1 - Taxe URSSAF
+    public JTextField            txtBenefit;                { txtBenefit              = new JTextField        ();}    // D2 - Différence Taxe
     public JButton               btOpenFacture;          { btOpenFacture        = new JButton           ();}    // E1 - Ouvrir facture
     public JButton               btSearchFacture;        { btSearchFacture      = new JButton           ();}    // E2 - Parcourir facture
     public JButton               btRep1;                 { btRep1               = new JButton           ();}    // ... - Renseignement du répertoire -> Facture
@@ -66,8 +66,8 @@ public class Display
     public JTextField            txtTotalTTC;            { txtTotalTTC          = new JTextField        ();}    // A1 - Résultat Total TTC
     public JTextField            txtTotalHT;             { txtTotalHT           = new JTextField        ();}    // A2 - Résultat Total HT
     public JComboBox<String>     boxYearsTotal;          { boxYearsTotal        = new JComboBox<String> ();}    // A3 - Années
-    public JTextField            txtTotalTaxeUrssaf;     { txtTotalTaxeUrssaf   = new JTextField        ();}    // B1 - Taxe Total
-    public JTextField            txtTotalTaxe;           { txtTotalTaxe         = new JTextField        ();}    // B2 - Différence Total
+    public JTextField            txtTotalTaxe;           { txtTotalTaxe         = new JTextField        ();}    // B1 - Taxe Total
+    public JTextField            txtTotalBenefit;        { txtTotalBenefit      = new JTextField        ();}    // B2 - Bénéfice Total
     public JButton               btReset2;               { btReset2             = new JButton           ();}    // B3 - RAZ
 
     // Année et mois
@@ -236,16 +236,16 @@ public class Display
         labUrssaf.setFont(styleFont2);
 
         // D1 - Taxe URSSAF
-        JLabel labTaxeUrssaf = new JLabel("Montant taxe");
-        addComposant(pan1, labTaxeUrssaf, 0, 16, 1);
-        txtTaxeUrssaf = createTextField(60, 18);
-        addComposant(pan1, txtTaxeUrssaf, 0, 18, 1);
+        JLabel labTaxe = new JLabel("Taxes");
+        addComposant(pan1, labTaxe, 0, 16, 1);
+        txtTaxe = createTextField(60, 18);
+        addComposant(pan1, txtTaxe, 0, 18, 1);
 
         // D2 - Différence Taxe
-        JLabel labTaxe = new JLabel("Restant");
-        addComposant(pan1, labTaxe, 1, 16,1);
-        txtTaxe = createTextField(60, 18);
-        addComposant(pan1, txtTaxe, 1, 18, 1);
+        JLabel labBenefit = new JLabel("Bénéfices");
+        addComposant(pan1, labBenefit, 1, 16,1);
+        txtBenefit = createTextField(60, 18);
+        addComposant(pan1, txtBenefit, 1, 18, 1);
 
         // /************************** Liens **************************/
         JLabel labLiens = new JLabel("<html><u>Liens</u></html>");
@@ -355,16 +355,16 @@ public class Display
         labTotalUrssaf.setFont(styleFont2);
 
         // B1 - Taxe Total
-        JLabel labTotalFactureTaxeUrssaf = new JLabel("Total taxe");
-        addComposant(pan2, labTotalFactureTaxeUrssaf, 0, 8, 1);
-        txtTotalTaxeUrssaf = createTextField(60, 18);
-        addComposant(pan2, txtTotalTaxeUrssaf, 0, 10, 1);
-   
-        // B2 - Différence Total 
-        JLabel labTotalFactureTaxe = new JLabel("Total différence");
-        addComposant(pan2, labTotalFactureTaxe, 1, 8, 1);
+        JLabel labTotalTaxe = new JLabel("Total Taxe");
+        addComposant(pan2, labTotalTaxe, 0, 8, 1);
         txtTotalTaxe = createTextField(60, 18);
-        addComposant(pan2, txtTotalTaxe, 1, 10, 1);
+        addComposant(pan2, txtTotalTaxe, 0, 10, 1);
+   
+        // B2 - Bénéfices Total 
+        JLabel labTotalBenefit = new JLabel("Total Bénéfices");
+        addComposant(pan2, labTotalBenefit, 1, 8, 1);
+        txtTotalBenefit = createTextField(60, 18);
+        addComposant(pan2, txtTotalBenefit, 1, 10, 1);
 
         // B3 - RAZ
         btReset2 = new JButton("RAZ");
