@@ -41,8 +41,9 @@ public class AppFacture
               ||                                                          ||
               || URSSAF                                                   ||
               ||                                                          ||
-              ||   Montant taxe        Restant                            || 
+              ||   Montant taxe       Bénéfices                           || 
               ||     [_(D1)_]         [_(D2)_]                            ||               
+              ||                                                          ||
               ||                                                          ||
               || Liens                                                    ||
               ||                                                          ||
@@ -77,15 +78,16 @@ public class AppFacture
               ||  |                                                   |   ||
               ||  |___________________________________________________|   ||
               ||                                                          ||
-              ||   Facture                                                ||
+              ||   Facture                                   Année        ||
+              ||                                            [_(A1)_]      ||
               ||                                                          ||
-              ||   Total TTC        Total HT                 Année        ||
-              ||    [_(A1)_]        [_(A2)_]                [_(A3)_]>     ||
+              ||   Total TTC        Total HT                  TVA         ||
+              ||    [_(B1)_]        [_(B2)_]                [_(B3)_]      ||
               ||                                                          ||
               ||   URSSAF                                                 ||
               ||                                                          ||
-              ||   Total taxe   Total différence                          ||
-              ||    [_(B1)_]        [_(B2)_]                 [RAZ](B3)    ||
+              ||   Total taxe    Total bénéfices                          ||
+              ||    [_(C1)_]        [_(C2)_]                 [RAZ](C3)    ||
               ||                                                          ||
               ||__________________________________________________________||    
               

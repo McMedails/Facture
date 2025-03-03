@@ -401,7 +401,6 @@ public class Treatment
 
     public void graphicListener()
     {
-
         // Initialisation des données graphiques
         graphic.clearGraph();
 
@@ -412,12 +411,18 @@ public class Treatment
         boolean     acre2025        = false;
         String      currentMonth    = null;
         String      currentYear     = null;
+        Double      currentTTC      = null;
         Double      currentHT       = null;
         Double      currentTVA      = null;
-        Double      currentTTC      = null;
         Double      currentTaxe     = null;
-        Double      currentBenefit   = null;
+        Double      currentBenefit  = null;
+        Double      totalTTC        = 0.0;
         Double      totalHT         = 0.0;
+        Double      totalTVA        = 0.0;
+        Double      totalTaxe       = 0.0;
+        Double      totalBenefit    = 0.0;
+        Double      totalii         = 0.0;
+        Double      totaljj         = 0.0;
         Double      graphHT         = 0.0;
         Double      graphTTC        = 0.0;
         Double      graphTVA        = 0.0;
@@ -501,21 +506,10 @@ public class Treatment
                     // Calcule Facture (HT + TTC) 
                     String convTotalHT = readFile.line.substring(readFile.line.indexOf("HT --> ") + 7).trim();
                     totalHT += Double.parseDouble(convTotalHT); 
-                    graphHT = Double.parseDouble(convTotalHT);
+                    graphHT  = Double.parseDouble(convTotalHT);
                     graphTTC = Double.parseDouble(convTotalHT) * TVA;
                     graphTVA = graphTTC - graphHT;
-
-                    // Caclule TVA
-                    double totalTTC = totalHT * TVA;
-                    String convTotalTTC = Double.toString(totalTTC);
-                    display.txtTotalTTC.setText(convTotalTTC);
-
-                    // Calcule Total URSSAF (Taxe) 
-                    double totalTaxe = 0.0;
-                    double totalBenefit = 0.0;
-                    double totalii = 0.0;
-                    double totaljj = 0.0;
-
+         
                     // Année 2024 (ACRE)
                     if (acre2024) 
                     {
@@ -551,40 +545,53 @@ public class Treatment
                     }
 
                     // Résultat des calcules
+                    totalTTC = totalHT * TVA;
+                    totalTVA = totalTTC - totalHT;
                     totalBenefit = totalHT - totalTaxe;
-                    String resultatHT = (String.format("%.1f", totalHT));              
-                    String resultatTaxe = String.format("%.1f", totalTaxe);
-                    String resultatBenefit = String.format("%.1f", totalBenefit);
-                    display.txtTotalHT.setText(resultatHT);
-                    display.txtTotalTaxe.setText(resultatTaxe);
-                    display.txtTotalBenefit.setText(resultatBenefit);
+                      
+                    /* B1 */ String resultatTTC = Double.toString(totalTTC);
+                    /* B1 */ display.txtTotalTTC.setText(resultatTTC);
+                    /* B2 */ String resultatHT = (String.format("%.1f", totalHT)); 
+                    /* B2 */ display.txtTotalHT.setText(resultatHT);
+                    /* B3 */ String resultatTVA = (String.format("%.1f", totalTVA));
+                    /* B3 */ display.txtTotalTVA.setText(resultatTVA);
+                    /* C1 */ String resultatTaxe = String.format("%.1f", totalTaxe);
+                    /* C1 */ display.txtTotalTaxe.setText(resultatTaxe);
+                    /* C2 */ String resultatBenefit = String.format("%.1f", totalBenefit);
+                    /* C2 */ display.txtTotalBenefit.setText(resultatBenefit);
 
                     /************************* GRAPHIQUE **************************/ 
 
-                    currentTTC = graphTTC;
-                    currentTVA = graphTVA;
-                    currentHT = Double.parseDouble(convTotalHT.replace(",", "."));
-                    currentTaxe = graphTaxe;
-                    currentBenefit = graphBenefit;        
+                    /* B1 */ currentTTC = graphTTC;
+                    /* B2 */ currentHT = Double.parseDouble(convTotalHT.replace(",", "."));
+                    /* B3 */ currentTVA = graphTVA;
+                    /* C1 */ currentTaxe = graphTaxe;
+                    /* C2 */ currentBenefit = graphBenefit;        
+
+                    boolean filterTTC = false;
+                    boolean filterTVA = false;
+                    boolean filterHT = false;
+                    boolean filterTaxe = false;
+                    boolean filterBenefit = false;
 
                     // Trouve le mois correspondant et stocke la valeur HT dans le tableau
                     for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++) 
                     {
                         if (graphic.GRAPHMONTHS[kk].equals(currentMonth)) 
                         { 
-                            graphData[kk][kk][kk][kk][0] = currentTTC; 
-                            graphData[kk][kk][kk][kk][1] = currentTVA;         
-                            graphData[kk][kk][kk][kk][2] = currentHT;
-                            graphData[kk][kk][kk][kk][3] = currentTaxe; 
-                            graphData[kk][kk][kk][kk][4] = currentBenefit;
+                            graphData[kk][kk][kk][kk][0] = currentTTC;       // TTC      
+                            graphData[kk][kk][kk][kk][1] = currentTVA;       // TVA           
+                            graphData[kk][kk][kk][kk][2] = currentHT;        // HT       
+                            graphData[kk][kk][kk][kk][3] = currentTaxe;      // URSSAF   
+                            graphData[kk][kk][kk][kk][4] = currentBenefit;   // Bénéfices 
                         }
                         else
                         {
-                            graphData[kk][kk][kk][kk][0] = null;    
-                            graphData[kk][kk][kk][kk][1] = null;    
-                            graphData[kk][kk][kk][kk][2] = null;    
-                            graphData[kk][kk][kk][kk][3] = null;   
-                            graphData[kk][kk][kk][kk][4] = null;   
+                            graphData[kk][kk][kk][kk][0] = null;  // TTC        
+                            graphData[kk][kk][kk][kk][1] = null;  // TVA        
+                            graphData[kk][kk][kk][kk][2] = null;  // HT         
+                            graphData[kk][kk][kk][kk][3] = null;  // URSSAF    
+                            graphData[kk][kk][kk][kk][4] = null;  // Bénéfices 
                         }
                     }
                     // Renvoie des données calculées vers le graphique
@@ -612,11 +619,12 @@ public class Treatment
     // B3 -> RAZ
     public void clearListener2()
     {
-        /* A1 */ display.txtTotalHT.setText("");  
-        /* A2 */ display.txtTotalTTC.setText("");
-        /* A3 */ display.boxYearsTotal.setSelectedItem("");
-        /* B1 */ display.txtTotalTaxe.setText("");
-        /* B2 */ display.txtTotalBenefit.setText("");    
+        /* A1 */ display.boxYearsTotal.setSelectedItem("");
+        /* B1 */ display.txtTotalTTC.setText("");
+        /* B2 */ display.txtTotalHT.setText("");  
+        /* B3 */ display.txtTVA.setText("");
+        /* C1 */ display.txtTotalTaxe.setText("");
+        /* C2 */ display.txtTotalBenefit.setText("");    
         graphic.clearGraph();      
     }
 }
