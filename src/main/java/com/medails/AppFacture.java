@@ -33,11 +33,14 @@ public class AppFacture
               ||      Année             Mois         Date de paiement     ||
               ||     [_(A1)_]>        [_(A2)_]>   [_______(A3)________]>  ||                     
               ||                                                          ||
+              ||                                                          ||
               || Jours travaillées      TJM                               ||
               ||     [_(B1)_]         [_(B2)_]        [Calculer](B3)      ||
               ||                                                          ||
+              ||                                                          ||
               ||       TTC               HT              TVA              ||
               ||     [_(C1)_]         [_(C2)_]         [_(C3)_]           ||
+              ||                                                          ||
               ||                                                          ||
               || URSSAF                                                   ||
               ||                                                          ||
@@ -60,7 +63,6 @@ public class AppFacture
 
                ____________________________________________________________  
               || Enregistrement|Graphique|                                || 
-              ||       Annuel|Mensuel                                     ||
               ||   ___________________________________________________    ||
               ||  |                                                   |   ||
               ||  |                                                   |   || 
@@ -77,17 +79,20 @@ public class AppFacture
               ||  |                                                   |   || 
               ||  |                                                   |   ||
               ||  |___________________________________________________|   ||
+              ||       Annuel|Mensuel                                     ||
               ||                                                          ||
-              ||   Facture                                   Année        ||
-              ||                                            [_(A1)_]      ||
+              ||      TTC     TVA     HT      URSSAF      Bénéfices       ||  
+              ||     ■(A1)    ■(A2)  ■(A3)     ■(A4)        ■(A5)         ||
+              ||                                                          ||
+              ||   Facture                                  [_(B1)_]      ||
               ||                                                          ||
               ||   Total TTC        Total HT                  TVA         ||
-              ||    [_(B1)_]        [_(B2)_]                [_(B3)_]      ||
+              ||    [_(C1)_]        [_(C2)_]                [_(C3)_]      ||
               ||                                                          ||
               ||   URSSAF                                                 ||
               ||                                                          ||
               ||   Total taxe    Total bénéfices                          ||
-              ||    [_(C1)_]        [_(C2)_]                 [RAZ](C3)    ||
+              ||    [_(D1)_]        [_(D2)_]                 [RAZ](D3)    ||
               ||                                                          ||
               ||__________________________________________________________||    
               

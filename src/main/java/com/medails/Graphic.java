@@ -56,7 +56,7 @@ public class Graphic
         // Création du graphique à barres (Annuel)
         JFreeChart chart = ChartFactory.createBarChart(null,                 /* Titre du graphique */
                                                        null,                /* Axe des abscisses */ 
-                                                       "Résultats",        /* Axe des ordonnées */  
+                                                       null,               /* Axe des ordonnées */  
                     dataset, PlotOrientation.HORIZONTAL, true,            /*Légende */ 
                                                            true,         /*Info tooltips */ 
                                                             false);     /* URL */
@@ -91,8 +91,8 @@ public class Graphic
         display.tabGraph.addTab("Annuel", chartPanelYears);
         display.tabGraph.addTab("Mensuel", chartPanelMonths);
         display.gbc.gridx = 0;
-        display.gbc.gridy = 0;
-        display.gbc.gridwidth = 3;
+        display.gbc.gridy = 2;
+        display.gbc.gridwidth = 5;
         display.pan2.add(display.tabGraph, display.gbc);
     }
 

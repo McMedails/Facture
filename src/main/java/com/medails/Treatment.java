@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -549,16 +550,16 @@ public class Treatment
                     totalTVA = totalTTC - totalHT;
                     totalBenefit = totalHT - totalTaxe;
                       
-                    /* B1 */ String resultatTTC = Double.toString(totalTTC);
-                    /* B1 */ display.txtTotalTTC.setText(resultatTTC);
-                    /* B2 */ String resultatHT = (String.format("%.1f", totalHT)); 
-                    /* B2 */ display.txtTotalHT.setText(resultatHT);
-                    /* B3 */ String resultatTVA = (String.format("%.1f", totalTVA));
-                    /* B3 */ display.txtTotalTVA.setText(resultatTVA);
-                    /* C1 */ String resultatTaxe = String.format("%.1f", totalTaxe);
-                    /* C1 */ display.txtTotalTaxe.setText(resultatTaxe);
-                    /* C2 */ String resultatBenefit = String.format("%.1f", totalBenefit);
-                    /* C2 */ display.txtTotalBenefit.setText(resultatBenefit);
+                    /* C1 */ String resultatTTC = Double.toString(totalTTC);
+                    /* C1 */ display.txtTotalTTC.setText(resultatTTC);
+                    /* C2 */ String resultatHT = (String.format("%.1f", totalHT)); 
+                    /* C2 */ display.txtTotalHT.setText(resultatHT);
+                    /* C3 */ String resultatTVA = (String.format("%.1f", totalTVA));
+                    /* C3 */ display.txtTotalTVA.setText(resultatTVA);
+                    /* D1 */ String resultatTaxe = String.format("%.1f", totalTaxe);
+                    /* D1 */ display.txtTotalTaxe.setText(resultatTaxe);
+                    /* D2 */ String resultatBenefit = String.format("%.1f", totalBenefit);
+                    /* D2 */ display.txtTotalBenefit.setText(resultatBenefit);
 
                     /************************* GRAPHIQUE **************************/ 
 
@@ -566,34 +567,41 @@ public class Treatment
                     /* B2 */ currentHT = Double.parseDouble(convTotalHT.replace(",", "."));
                     /* B3 */ currentTVA = graphTVA;
                     /* C1 */ currentTaxe = graphTaxe;
-                    /* C2 */ currentBenefit = graphBenefit;        
+                    /* C2 */ currentBenefit = graphBenefit;   
 
-                    boolean filterTTC = false;
-                    boolean filterTVA = false;
-                    boolean filterHT = false;
-                    boolean filterTaxe = false;
-                    boolean filterBenefit = false;
-
-                    // Trouve le mois correspondant et stocke la valeur HT dans le tableau
-                    for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++) 
-                    {
-                        if (graphic.GRAPHMONTHS[kk].equals(currentMonth)) 
-                        { 
-                            graphData[kk][kk][kk][kk][0] = currentTTC;       // TTC      
-                            graphData[kk][kk][kk][kk][1] = currentTVA;       // TVA           
-                            graphData[kk][kk][kk][kk][2] = currentHT;        // HT       
-                            graphData[kk][kk][kk][kk][3] = currentTaxe;      // URSSAF   
-                            graphData[kk][kk][kk][kk][4] = currentBenefit;   // Bénéfices 
-                        }
-                        else
-                        {
-                            graphData[kk][kk][kk][kk][0] = null;  // TTC        
-                            graphData[kk][kk][kk][kk][1] = null;  // TVA        
-                            graphData[kk][kk][kk][kk][2] = null;  // HT         
-                            graphData[kk][kk][kk][kk][3] = null;  // URSSAF    
-                            graphData[kk][kk][kk][kk][4] = null;  // Bénéfices 
+                    // Réinitialiser graphData pour éviter les valeurs résiduelles
+                    for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++) {
+                        for (int ll = 0; ll < 5; ll++) { // 5 correspond au nombre de catégories (TTC, TVA, HT, etc.)
+                            graphData[kk][kk][kk][kk][ll] = null;
                         }
                     }
+
+                    // Trouve le mois correspondant et stocke la valeur dans le tableau
+                    Object[][] filters = 
+                    {
+                        { display.cckTTC,      0,  currentTTC},
+                        { display.cckTVA,      1,  currentTVA},
+                        { display.cckHT,       2,  currentHT},
+                        { display.cckTaxe,     3,  currentTaxe},
+                        { display.cckBenefit,  4,  currentBenefit},
+                    };
+
+                    for(Object[] filter : filters)
+                    {
+                        JCheckBox checkBox = (JCheckBox) filter[0];
+                        int index = (int) filter[1];
+                        Double value = (Double) filter[2];
+
+                        // Vérifie si la checkbox est cochée
+                        if (filterGraph(checkBox))
+                        {
+                            for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++)
+                            {
+                                graphData[kk][kk][kk][kk][index] = graphic.GRAPHMONTHS[kk].equals(currentMonth)? value : null;
+                            }
+                        }
+                    }
+
                     // Renvoie des données calculées vers le graphique
                     graphic.updateDatasets(graphData);
                     
@@ -614,6 +622,12 @@ public class Treatment
                                                             "Erreur", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
+    }
+
+    // CheckBox Graphique
+    public boolean filterGraph(JCheckBox checkBox)
+    {
+        return checkBox.isSelected();
     }
 
     // B3 -> RAZ
