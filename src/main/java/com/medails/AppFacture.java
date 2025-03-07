@@ -19,7 +19,8 @@ public class AppFacture
                 Display display = new Display();
                 Graphic graphic = new Graphic(display);
                 ReadFile readFile = new ReadFile();
-                Treatment treatment = new Treatment(display, graphic, readFile); 
+                Treatment1 treatment1 = new Treatment1(display, readFile); 
+                Treatment2 treatment2 = new Treatment2(display, graphic, readFile); 
             }
         });
     }

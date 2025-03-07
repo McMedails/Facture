@@ -28,14 +28,17 @@ import com.toedter.calendar.JDateChooser;
 public class Display
 {    
     /************************* Variables d'instance **************************/
+    
     public JFrame fen;
     public JPanel pan1;
     public JPanel pan2;
-    public JPanel panRep1;
+    public JPanel pan3;
     public JScrollPane scroll1;
     public JScrollPane scroll2;
+    public JScrollPane scroll3;
     public JTabbedPane tabMain;
     public JTabbedPane tabGraph;    
+    public JTabbedPane tabDeduction;    
     public GridBagConstraints gbc;
 
     /*********** Onglet 1 ***************/
@@ -64,18 +67,21 @@ public class Display
     public JButton               btReset1;               { btReset1             = new JButton           ();}    // K2 - RAZ
 
     /*********** Onglet 2 ***************/
-    public JCheckBox             cckTTC;                 { cckTTC               = new JCheckBox         ();}    // A1 - TTC
-    public JCheckBox             cckTVA;                 { cckTVA               = new JCheckBox         ();}    // A2 - TVA
-    public JCheckBox             cckHT;                  { cckHT                = new JCheckBox         ();}    // A3 - HT
-    public JCheckBox             cckTaxe  ;              { cckTaxe              = new JCheckBox         ();}    // A4 - Urssaf
-    public JCheckBox             cckBenefit;             { cckBenefit           = new JCheckBox         ();}    // A5 - Bénéfices
-    public JComboBox<String>     boxYearsTotal;          { boxYearsTotal        = new JComboBox<String> ();}    // B1 - Années
-    public JTextField            txtTotalTTC;            { txtTotalTTC          = new JTextField        ();}    // C1 - Résultat Total TTC
-    public JTextField            txtTotalHT;             { txtTotalHT           = new JTextField        ();}    // C2 - Résultat Total HT
-    public JTextField            txtTotalTVA;            { txtTotalTVA          = new JTextField        ();}    // C3 - Taxe Total
-    public JTextField            txtTotalTaxe;           { txtTotalTaxe         = new JTextField        ();}    // D1 - Taxe Total
-    public JTextField            txtTotalBenefit;        { txtTotalBenefit      = new JTextField        ();}    // D2 - Bénéfice Total
-    public JButton               btReset2;               { btReset2             = new JButton           ();}    // D3 - RAZ
+    public JCheckBox             cckTTC;                 { cckTTC               = new JCheckBox         ("", true);}    // A1 - TTC
+    public JCheckBox             cckTVA;                 { cckTVA               = new JCheckBox         ("", true);}    // A2 - TVA
+    public JCheckBox             cckHT;                  { cckHT                = new JCheckBox         ("", true);}    // A3 - HT
+    public JCheckBox             cckTaxe  ;              { cckTaxe              = new JCheckBox         ("", true);}    // A4 - Urssaf
+    public JCheckBox             cckBenefit;             { cckBenefit           = new JCheckBox         ("", true);}    // A5 - Bénéfices
+    public JComboBox<String>     boxYearsTotal;          { boxYearsTotal        = new JComboBox<String> ();}                          // B1 - Années
+    public JTextField            txtTotalTTC;            { txtTotalTTC          = new JTextField        ();}                          // C1 - Résultat Total TTC
+    public JTextField            txtTotalHT;             { txtTotalHT           = new JTextField        ();}                          // C2 - Résultat Total HT
+    public JTextField            txtTotalTVA;            { txtTotalTVA          = new JTextField        ();}                          // C3 - Taxe Total
+    public JTextField            txtTotalTaxe;           { txtTotalTaxe         = new JTextField        ();}                          // D1 - Taxe Total
+    public JTextField            txtTotalBenefit;        { txtTotalBenefit      = new JTextField        ();}                          // D2 - Bénéfice Total
+    public JButton               btReset2;               { btReset2             = new JButton           ();}                          // D3 - RAZ
+
+    /*********** Onglet 3 ***************/  
+    public JCheckBox             cckTotal;               { cckTotal               = new JCheckBox       ("", true);}    // A1 - Déduction
 
     // Année et mois
     private String years[] = {"", "2024", "2025", "2026", "2027", "2028"};
@@ -83,16 +89,13 @@ public class Display
                                       "Mai", "Juin", "Juillet", "Août", "Septembre", 
                                       "Octobre", "Novembre", "Décembre"};
         
-    /************* Déclarations Classes ****************/
-    private Treatment treatment;
-    private Graphic graphic;
-
     /*********** Constructeur ***************/
     public Display()
     {   
         fenPosition();
         pan1Position();
         pan2Position();
+        pan3Position();
     }
 
     public void fenPosition()
@@ -101,6 +104,7 @@ public class Display
         fen = new JFrame();
         pan1 = new JPanel();
         pan2 = new JPanel();
+        pan3 = new JPanel();
 
         // Configuration Fenetre/Panel
         fen.setTitle("Gestionnaie de facture");
@@ -109,20 +113,26 @@ public class Display
         fen.setResizable(false);
         pan1.setBackground(Color.LIGHT_GRAY);
         pan2.setBackground(Color.LIGHT_GRAY);
+        pan3.setBackground(Color.LIGHT_GRAY);
         pan1.setLayout(new GridBagLayout());   
         pan2.setLayout(new GridBagLayout());   
+        pan3.setLayout(new GridBagLayout());   
 
         // Ajout du scroll aux panels
         scroll1 = new JScrollPane(pan1);
         scroll2 = new JScrollPane(pan2);
+        scroll3 = new JScrollPane(pan3);
         scroll1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroll3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         
         // Onglets - utilisation les JScrollPane au lieu des JPanel
         tabMain = new JTabbedPane();
         tabMain.add("Enregistrement", scroll1);
         tabMain.add("Graphique", scroll2);
+        tabMain.add("Déducttion", scroll3);
         tabGraph = new JTabbedPane();
+        tabDeduction = new JTabbedPane();
         // Ajout des onglets dans Fenetre
         fen.add(tabMain, BorderLayout.CENTER);
 
@@ -137,7 +147,8 @@ public class Display
 
     /************************** Factorisation **************************/
 
-    private void addComposant (JPanel panel, JComponent component, int gridx, int gridy, int gridwidth)
+    private void addComposant (JPanel panel, JComponent component, 
+                               int gridx, int gridy, int gridwidth)
     {
         gbc.gridx = gridx;
         gbc.gridy = gridy;
@@ -250,7 +261,7 @@ public class Display
 
         // D2 - Différence Taxe
         JLabel labBenefit = new JLabel("Bénéfices");
-        addComposant(pan1, labBenefit, 1, 16,1);
+        addComposant(pan1, labBenefit, 1, 16, 1);
         txtBenefit = createTextField(60, 18);
         addComposant(pan1, txtBenefit, 1, 18, 1);
 
@@ -336,14 +347,13 @@ public class Display
         /************************* Facture **************************/
         // A1 - TTC
         JLabel labcckTTC = new JLabel("TTC");
-        gbc.insets = new Insets(0, 10, 10, 10);
+        gbc.insets = new Insets(0, 0, 10, 10);
         addComposant(pan2, labcckTTC, 0, 4, 1);
         cckTTC.setBackground(Color.LIGHT_GRAY);
         addComposant(pan2, cckTTC, 0, 6, 1);
 
         // A2 - TVA
         JLabel labcckTVA = new JLabel("TVA");
-        gbc.insets = new Insets(0, 0, 10, 0);
         addComposant(pan2, labcckTVA, 1, 4, 1);
         cckTVA.setBackground(Color.LIGHT_GRAY);
         addComposant(pan2, cckTVA, 1, 6, 1);
@@ -356,7 +366,6 @@ public class Display
 
         // A4 - URSSAF
         JLabel labcckTaxe = new JLabel("URSSAF");
-        gbc.insets = new Insets(0, -50, 10, 0);
         addComposant(pan2, labcckTaxe, 3, 4, 1);
         cckTaxe.setBackground(Color.LIGHT_GRAY);
         addComposant(pan2, cckTaxe, 3, 6, 1);
@@ -368,52 +377,85 @@ public class Display
         addComposant(pan2, cckBenefit, 4, 6, 1);
         
         JLabel labTotalFacture = new JLabel("<html><u>Facture</u></html>");
-        gbc.insets = new Insets(0, 10, 10, 10);
+        gbc.insets = new Insets(0, 20, 10, 10);
         addComposant(pan2, labTotalFacture, 0, 8, 1);
         labTotalFacture.setFont(styleFont1);
 
         // B1 - Années
         boxYearsTotal = createJComboBox(60, 18, years);
-        addComposant(pan2, boxYearsTotal, 3, 8, 1);
+        gbc.insets = new Insets(0, -50, 10, 0);
+        addComposant(pan2, boxYearsTotal, 4, 8, 1);
 
         // C1 - Total TTC
         JLabel labTotalFactureTTC = new JLabel("Total TTC");
+        gbc.insets = new Insets(0, 20, 10, 10);
         addComposant(pan2, labTotalFactureTTC, 0, 12, 1);
         txtTotalTTC = createTextField(60, 18);
         addComposant(pan2, txtTotalTTC, 0, 14, 1);
 
         // C2 - Total HT
         JLabel labTotalFactureHT = new JLabel("Total HT");
+        gbc.insets = new Insets(0, -15, 10, 10);
         addComposant(pan2, labTotalFactureHT, 2, 12, 1);
         txtTotalHT = createTextField(60, 18);
         addComposant(pan2, txtTotalHT, 2, 14, 1);
 
         // C3 - Total TVA
         JLabel labTotalFactureTVA = new JLabel("Total TVA");
-        addComposant(pan2, labTotalFactureTVA, 3, 12, 1);
+        gbc.insets = new Insets(0, -50, 10, 0);
+        addComposant(pan2, labTotalFactureTVA, 4, 12, 1);
         txtTotalTVA = createTextField(60, 18);
-        addComposant(pan2, txtTotalTVA, 3, 14, 1);
+        addComposant(pan2, txtTotalTVA, 4, 14, 1);
         
         /************************* URSSAF **************************/
         JLabel labTotalUrssaf = new JLabel("<html><u>URSSAF</u></html>");
+        gbc.insets = new Insets(0, 20, 10, 10);
         addComposant(pan2, labTotalUrssaf, 0, 16, 1);
         labTotalUrssaf.setFont(styleFont2);
 
         // D1 - Taxe Total
-        JLabel labTotalTaxe = new JLabel("Total Taxe");
+        JLabel labTotalTaxe = new JLabel("Total Urssaf");
         addComposant(pan2, labTotalTaxe, 0, 18, 1);
         txtTotalTaxe = createTextField(60, 18);
         addComposant(pan2, txtTotalTaxe, 0, 20, 1);
    
         // D2 - Bénéfices Total 
         JLabel labTotalBenefit = new JLabel("Total Bénéfices");
+        gbc.insets = new Insets(0, -15, 10, 10);
         addComposant(pan2, labTotalBenefit, 2, 18, 1);
         txtTotalBenefit = createTextField(60, 18);
         addComposant(pan2, txtTotalBenefit, 2, 20, 1);
 
         // D3 - RAZ
         btReset2 = new JButton("RAZ");
-        addComposant(pan2, btReset2, 3, 20, 1);     
+        gbc.insets = new Insets(0, -50, 10, 0);
+        addComposant(pan2, btReset2, 4, 20, 1);     
+    }
+
+    /*********************************************************** 
+                              PANEL 3 
+    ***********************************************************/
+
+    public void pan3Position()
+    {
+        /********************** Déduction ***********************/
+        JLabel labDeduction = new JLabel("<html><u>Déduction</u></html>");
+        gbc.insets = new Insets(0, 10, 10, 10);
+        addComposant(pan3, labDeduction, 0, 4, 1);
+        labDeduction.setFont(styleFont2);   
+        
+        // A1 - Déduction
+        JLabel labcckTotal = new JLabel("Déduction");
+        gbc.insets = new Insets(0, 0, 10, 10);
+        addComposant(pan3, labcckTotal, 0, 6, 1);
+        cckTotal.setBackground(Color.LIGHT_GRAY);
+        addComposant(pan3, cckTotal, 0, 8, 1);
+
+        JLabel labDeductionTTC = new JLabel("Montant TTC");
+        addComposant(pan3, labDeductionTTC, 2, 6, 1);
+
+        JLabel labDeductionHT = new JLabel("Montant HT");
+        addComposant(pan3, labDeductionHT, 4, 6, 1);
     }
 }
                         

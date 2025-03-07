@@ -17,10 +17,12 @@ import java.util.Set;
 public class ReadFile
 {
     /************************* Variables de classe **************************/
+
     // Nom du fichier
     private static final String FILENAME = "Facture.txt";
 
     /************************* Variables d'instance' **************************/
+    
     // Chemin d'accès du fichier
     public String filePath;
 
