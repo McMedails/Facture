@@ -6,10 +6,9 @@ import java.io.IOException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
+import javax.swing.JSlider;
 
-import com.medails.Display;
-import com.medails.Graphic;
-import com.medails.ReadFile;
+import org.jfree.chart.JFreeChart;
 
     /************************************************************ 
                         TRAITEMENT DE DONNEES
@@ -19,55 +18,57 @@ public class Treatment2
 {
     /************************* Variables d'instance **************************/
 
-    // Taux de taxe
-    private final Double ACRE2024 = ((2.2 + 11.6 + 0.2) / 100);  // Année 2024 (ACRE)
-    private final Double ACRE2025 = ((2.2 + 12.3 + 0.2) / 100);  // Année 2025 (ACRE)
-    private final Double SANS2025 = ((2.2 + 24.6 + 0.2) / 100);  // Année 2025 (sans ACRE)
-    private final Double SANS20XX = ((2.2 + 26.1 + 0.2) / 100);  // Année 2026 ou plus
-    private final Double TVA = 1.2;
-
     // Données pour création graphique
     public static Double[][][][][] graphData = new Double[12][12][12][12][12];
-    public static Double[][][][][] graphDeduction = new Double[5][5][5][5][5];
 
     /************* Déclarations Classes ****************/
-    private Display display;
-    private Graphic graphic;
-    private ReadFile readFile;
+    private Display dp;
+    private Graphic gr;
+    private ReadWrite rw;
+    private Treatment1 tr1;
 
     /*********** Constructeur ***************/
-    public Treatment2(Display display, Graphic graphic, ReadFile readFile)
+    public Treatment2(Display dp, Graphic gr, ReadWrite rw, Treatment1 tr1)
     {
-        this.display = display;
-        this.graphic = graphic;  
-        this.readFile = readFile;  
+        this.dp = dp;
+        this.gr = gr;  
+        this.rw = rw;  
+        this.tr1 = tr1;
                               
         /*********** Panel 2 ***************/
-        actionJElements();
-        clearListener2();     
-        graphic.updateDatasets(graphData, graphic.GRAPHMONTHS);                               
+        actionJElements();  
+        gr.updateDatasets(graphData, gr.GRAPHMONTHS, gr.CATEGORIES, gr.dataYears, gr.dataMonths);                               
     }
 
-    public void actionJElements()
+    private void actionJElements()
     {
         /*********** Panel 2 ***************/
-        display.boxYearsTotal           .addActionListener (e -> graphicListener());
-        display.cckTTC                  .addActionListener (e -> graphicListener());
-        display.cckTVA                  .addActionListener (e -> graphicListener());
-        display.cckHT                   .addActionListener (e -> graphicListener());
-        display.cckTaxe                 .addActionListener (e -> graphicListener());
-        display.cckBenefit              .addActionListener (e -> graphicListener());
-        display.btReset2                .addActionListener (e -> clearListener2());
+        dp.sliPan2                 .addChangeListener (e -> graphListener());
+        dp.boxYearsTotal           .addActionListener (e -> graphListener());
+        dp.cckTTCPan2              .addActionListener (e -> graphListener());
+        dp.cckTVAPan2              .addActionListener (e -> graphListener());
+        dp.cckHTPan2               .addActionListener (e -> graphListener());
+        dp.cckTaxePan2             .addActionListener (e -> graphListener());
+        dp.cckBenefitPan2          .addActionListener (e -> graphListener());
+        dp.btReset2                .addActionListener (e -> clearListener());
     }
 
     /*********************************************************** 
                               PANEL 2 
     ***********************************************************/
     
-    public void graphicListener()
+    public void graphListener()
     {
+        // Mise à jour des graphiques avec la nouvelle échelle
+        slideRange(gr.chartYears, dp.sliPan2);
+        slideRange(gr.chartMonths, dp.sliPan2);
+
+        // Vérification existance du fichier
+        rw.existFile();
+
         // Initialisation des données graphiques
-        graphic.clearGraph();
+        gr.dataYears.clear();
+        gr.dataMonths.clear();
 
         // Initialisation des données
         boolean     monthAcre       = false;
@@ -75,72 +76,69 @@ public class Treatment2
         boolean     acre2024        = false;
         boolean     acre2025        = false;
         String      currentMonth    = null;
-        String      currentYear     = null;
-        Double      currentTTC      = null;
-        Double      currentHT       = null;
-        Double      currentTVA      = null;
-        Double      currentTaxe     = null;
-        Double      currentBenefit  = null;
-        Double      totalTTC        = 0.0;
-        Double      totalHT         = 0.0;
-        Double      totalTVA        = 0.0;
-        Double      totalTaxe       = 0.0;
-        Double      totalBenefit    = 0.0;
-        Double      totalii         = 0.0;
-        Double      totaljj         = 0.0;
-        Double      graphHT         = 0.0;
-        Double      graphTTC        = 0.0;
-        Double      graphTVA        = 0.0;
-        Double      graphTaxe       = 0.0;
-        Double      graphBenefit    = 0.0;
-        Double      ii              = 0.0;
-        Double      jj              = 0.0;
+        double      totalTTC        = 0.0;
+        double      totalHT         = 0.0;
+        double      totalTVA        = 0.0;
+        double      totalTaxe       = 0.0;
+        double      totalBenefit    = 0.0;
+        double      totalii         = 0.0;
+        double      totaljj         = 0.0;
+        double      graphTTC        = 0.0;
+        double      graphTVA        = 0.0;
+        double      graphHT         = 0.0;
+        double      graphTaxe       = 0.0;
+        double      graphBenefit    = 0.0;
+        double      ii              = 0.0;
+        double      jj              = 0.0;
+        int         cleartxt        = 0;
 
-        String selectedYear = (String) display.boxYearsTotal.getSelectedItem();
-        if (selectedYear.isEmpty()) 
-        {
-            clearListener2();         
-            return;
-        }
+        String selectedYear = (String) dp.boxYearsTotal.getSelectedItem();
+        if (selectedYear.isEmpty()) { clearListener(); return;}
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(readFile.filePath))) 
+        try (BufferedReader reader = new BufferedReader(new FileReader(rw.getFile()))) 
         {
-            while ((readFile.line = reader.readLine()) != null) 
+            while ((rw.line = reader.readLine()) != null) 
             {
                 // Détection de l'année sélectionnée
-                if (readFile.line.contains("Versement --> ") &&  readFile.line.contains(selectedYear))
+                if (rw.line.contains("Versement --> ") &&  rw.line.contains(selectedYear))
                 {
                     // Enrengistrement de l'année sélectionnée
                     activeYear = true;
 
+                    // Recherche des mois de versement
+                    String monthPart = rw.line.substring(rw.line.indexOf("Versement --> ") + 17).trim();
+                    int firstSpaceIndex = monthPart.indexOf(" ");
+                    if (firstSpaceIndex != -1)
+                    { currentMonth = monthPart.substring(0, firstSpaceIndex).trim(); }
+
                     // Année 2024 (ACRE)
-                    if (readFile.line.contains("2024")) 
+                    if (rw.line.contains("2024")) 
                     {
                         acre2024 = true;
                         acre2025 = false; 
                     }
 
                     // Année 2025 (ACRE)
-                    else if (readFile.line.contains("2025"))
+                    else if (rw.line.contains("2025")) 
                     {
                         // Vérification mois (ACRE) 
-                        if ((readFile.line.contains("janvier") ||
-                             readFile.line.contains("février") ||
-                             readFile.line.contains("mars") ||
-                             readFile.line.contains("avril"))) 
+                        if ((rw.line.contains("janvier") ||
+                             rw.line.contains("février") ||
+                             rw.line.contains("mars") ||
+                             rw.line.contains("avril"))) 
                             { 
                                 monthAcre = true;
                                 ii++; 
                             }
 
-                        if ((readFile.line.contains("mai") ||
-                             readFile.line.contains("juin") ||
-                             readFile.line.contains("juillet") ||
-                             readFile.line.contains("août") || 
-                             readFile.line.contains("septembre") || 
-                             readFile.line.contains("octobre") || 
-                             readFile.line.contains("novembre") || 
-                             readFile.line.contains("décembre"))) 
+                        if ((rw.line.contains("mai") ||
+                             rw.line.contains("juin") ||
+                             rw.line.contains("juillet") ||
+                             rw.line.contains("août") || 
+                             rw.line.contains("septembre") || 
+                             rw.line.contains("octobre") || 
+                             rw.line.contains("novembre") || 
+                             rw.line.contains("décembre"))) 
                             {
                                 monthAcre = false;
                                 jj++; 
@@ -156,47 +154,41 @@ public class Treatment2
                         acre2024 = false;
                         acre2025 = false;
                     }
-
-                    // Recherche des mois et années de versement
-                    String monthPart = readFile.line.substring(readFile.line.indexOf("Versement --> ") + 17).trim();
-                    int firstSpaceIndex = monthPart.indexOf(" ");
-                    if (firstSpaceIndex != -1)
-                    { currentMonth = monthPart.substring(0, firstSpaceIndex).trim(); }
-                      currentYear = readFile.line.substring(readFile.line.length() - 4).trim();
                 }  
+            
 
                 // Recherche et calcules à partir du montant HT
-                if (activeYear && readFile.line.contains("HT --> ")) 
+                if (activeYear && rw.line.contains("HT --> ")) 
                 {
                     // Calcule Facture (HT + TTC) 
-                    String convTotalHT = readFile.line.substring(readFile.line.indexOf("HT --> ") + 7).trim();
+                    String convTotalHT = rw.line.substring(rw.line.indexOf("HT --> ") + 7).trim();
                     totalHT += Double.parseDouble(convTotalHT); 
+                    graphTTC = Double.parseDouble(convTotalHT) * tr1.TVA;
                     graphHT  = Double.parseDouble(convTotalHT);
-                    graphTTC = Double.parseDouble(convTotalHT) * TVA;
                     graphTVA = graphTTC - graphHT;
          
                     // Année 2024 (ACRE)
                     if (acre2024) 
                     {
-                        totalTaxe = totalHT * ACRE2024;
-                        graphTaxe = graphHT * ACRE2024;
+                        totalTaxe = totalHT * tr1.ACRE2024;
+                        graphTaxe = graphHT * tr1.ACRE2024;
                         graphBenefit = graphHT - graphTaxe;
                     }
 
                     // Année 2025 (ACRE avec et sans)
                     if (acre2025) 
                     {
-                        totalii = (ii * (totalHT * ACRE2025));
-                        totaljj = (jj * (totalHT * SANS2025));
+                        totalii = (ii * (totalHT * tr1.ACRE2025));
+                        totaljj = (jj * (totalHT * tr1.SANS2025));
                         totalTaxe = (totalii + totaljj) / (ii + jj);
                         if(monthAcre)
                         {
-                            graphTaxe = graphHT * ACRE2025;
+                            graphTaxe = graphHT * tr1.ACRE2025;
                             graphBenefit = graphHT - graphTaxe;
                         }
                         else
                         {
-                            graphTaxe = graphHT * SANS2025;
+                            graphTaxe = graphHT * tr1.SANS2025;
                             graphBenefit = graphHT - graphTaxe;
                         }
                     }
@@ -204,40 +196,33 @@ public class Treatment2
                     // Année 2025 (sans ACRE) ou > 2025
                     if ((!acre2024 && !acre2025)) 
                     {
-                        totalTaxe = totalHT * SANS20XX;
-                        graphTaxe = graphHT * SANS20XX;
+                        totalTaxe = totalHT * tr1.SANS20XX;
+                        graphTaxe = graphHT * tr1.SANS20XX;
                         graphBenefit = graphHT - graphTaxe;
                     }
 
                     // Résultat des calcules
-                    totalTTC = totalHT * TVA;
+                    totalTTC = totalHT * tr1.TVA;
                     totalTVA = totalTTC - totalHT;
                     totalBenefit = totalHT - totalTaxe;
                       
+                    /************************* TEXTFIELD **************************/ 
                     /* C1 */ String resultatTTC = Double.toString(totalTTC);
-                    /* C1 */ display.txtTotalTTC.setText(resultatTTC);
+                    /* C1 */ dp.txtTotalTTC.setText(resultatTTC);
                     /* C2 */ String resultatHT = (String.format("%.1f", totalHT)); 
-                    /* C2 */ display.txtTotalHT.setText(resultatHT);
+                    /* C2 */ dp.txtTotalHT.setText(resultatHT);
                     /* C3 */ String resultatTVA = (String.format("%.1f", totalTVA));
-                    /* C3 */ display.txtTotalTVA.setText(resultatTVA);
+                    /* C3 */ dp.txtTotalTVA.setText(resultatTVA);
                     /* D1 */ String resultatTaxe = String.format("%.1f", totalTaxe);
-                    /* D1 */ display.txtTotalTaxe.setText(resultatTaxe);
+                    /* D1 */ dp.txtTotalTaxe.setText(resultatTaxe);
                     /* D2 */ String resultatBenefit = String.format("%.1f", totalBenefit);
-                    /* D2 */ display.txtTotalBenefit.setText(resultatBenefit);
+                    /* D2 */ dp.txtTotalBenefit.setText(resultatBenefit);
 
                     /************************* GRAPHIQUE **************************/ 
-
-                    /* B1 */ currentTTC = graphTTC;
-                    /* B2 */ currentHT = Double.parseDouble(convTotalHT.replace(",", "."));
-                    /* B3 */ currentTVA = graphTVA;
-                    /* C1 */ currentTaxe = graphTaxe;
-                    /* C2 */ currentBenefit = graphBenefit;   
-
-                    // Réinitialiser graphData pour éviter les valeurs résiduelles
-                    for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++) 
+                    // Réinitialise graphData pour éviter les valeurs résiduelles
+                    for (int kk = 0; kk < gr.GRAPHMONTHS.length; kk++) 
                     {
-                        // 5 correspond au nombre de catégories (TTC, TVA, HT, etc.)
-                        for (int ll = 0; ll < 5; ll++) 
+                        for (int ll = 0; ll < gr.CATEGORIES.length; ll++) 
                         { 
                             graphData[kk][kk][kk][kk][ll] = null;
                         }
@@ -246,11 +231,11 @@ public class Treatment2
                     // Trouve le mois correspondant et stocke la valeur dans le tableau
                     Object[][] filters = 
                     {
-                        { display.cckTTC,      0,  currentTTC},
-                        { display.cckTVA,      1,  currentTVA},
-                        { display.cckHT,       2,  currentHT},
-                        { display.cckTaxe,     3,  currentTaxe},
-                        { display.cckBenefit,  4,  currentBenefit},
+                        { dp.cckTTCPan2,        0,  graphTTC},
+                        { dp.cckTVAPan2,        1,  graphTVA},
+                        { dp.cckHTPan2,         2,  graphHT},
+                        { dp.cckTaxePan2,       3,  graphTaxe},
+                        { dp.cckBenefitPan2,    4,  graphBenefit},
                     };
 
                     for(Object[] filter : filters)
@@ -262,26 +247,39 @@ public class Treatment2
                         // Vérifie si la checkbox est cochée
                         if (filterGraph(checkBox))
                         {
-                            for (int kk = 0; kk < graphic.GRAPHMONTHS.length; kk++)
+                            for (int kk = 0; kk < gr.GRAPHMONTHS.length; kk++)
                             {
-                                graphData[kk][kk][kk][kk][index] = graphic.GRAPHMONTHS[kk].equals(currentMonth) ? value : null;
+                               // Equivalent : graphData[kk][kk][kk][kk][index] = gr.GRAPHMONTHS[kk].equals(currentMonth) ? value : null;
+                               if (gr.GRAPHMONTHS[kk].equals(currentMonth)) 
+                               {
+                                    graphData[kk][kk][kk][kk][index] = value;
+                                    cleartxt++;
+                               } 
+                               else 
+                               {
+                                    graphData[kk][kk][kk][kk][index] = null;
+                               }
                             }
                         }
                     }
 
                     // Renvoie des données calculées vers le graphique
-                    graphic.updateDatasets(graphData, graphic.GRAPHMONTHS);
+                    gr.updateDatasets(graphData, gr.GRAPHMONTHS, gr.CATEGORIES, gr.dataYears, gr.dataMonths);
                     
                     // Réinitialise pour le prochain mois
-                    activeYear = false;
-                    currentMonth = null;
-                    currentTTC = null;
-                    currentHT = null;
-                    currentTVA = null;
-                    currentTaxe = null;
-                    currentBenefit = null;
+                    activeYear     = false;
+                    currentMonth   = null;
+                    graphTTC       = 0.0;
+                    graphTVA       = 0.0;
+                    graphHT        = 0.0;
+                    graphTaxe      = 0.0;
+                    graphBenefit   = 0.0;
                 }  
-            }                                    
+            } 
+
+            // Nettoie les champs de saisie si graphique vide
+            if (cleartxt == 0) { clearListener(); } 
+
         }
         catch (IOException ex) 
         {
@@ -292,22 +290,27 @@ public class Treatment2
     }
 
 
-    // CheckBox Graphique
-    public boolean filterGraph(JCheckBox checkBox)
+    // Mise à jour des graphiques avec la nouvelle échelle
+    public void slideRange(JFreeChart chart, JSlider slide)
     {
-        return checkBox.isSelected();
+        int range = slide.getValue();
+        gr.updatChartRange(chart, range);
     }
 
     
-    // B3 -> RAZ
-    public void clearListener2()
+    // CheckBox Graphique
+    public boolean filterGraph(JCheckBox checkBox)
+    { return checkBox.isSelected(); }
+
+
+    // D3 -> RAZ
+    public void clearListener()
     {
-        /* A1 */ display.boxYearsTotal.setSelectedItem("");
-        /* B1 */ display.txtTotalTTC.setText("");
-        /* B2 */ display.txtTotalHT.setText("");  
-        /* B3 */ display.txtTVA.setText("");
-        /* C1 */ display.txtTotalTaxe.setText("");
-        /* C2 */ display.txtTotalBenefit.setText("");    
-        graphic.clearGraph();      
+        /* B1 */ dp.boxYearsTotal.setSelectedItem("");
+        /* C1 */ dp.txtTotalTTC.setText("");
+        /* C2 */ dp.txtTotalHT.setText("");  
+        /* C3 */ dp.txtTotalTVA.setText("");
+        /* D1 */ dp.txtTotalTaxe.setText("");
+        /* D2 */ dp.txtTotalBenefit.setText("");    
     }
 }

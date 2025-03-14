@@ -18,16 +18,18 @@ public class AppFacture
             {
                 Display display = new Display();
                 Graphic graphic = new Graphic(display);
-                ReadFile readFile = new ReadFile();
-                Treatment1 treatment1 = new Treatment1(display, readFile); 
-                Treatment2 treatment2 = new Treatment2(display, graphic, readFile); 
+                ReadWrite readwriteMain = new ReadWrite(ReadWrite.MAINFILENAME);
+                ReadWrite readwriteOther = new ReadWrite(ReadWrite.OTHERFILENAME);
+                Treatment1 treatment1 = new Treatment1(display, readwriteMain);  
+                Treatment2 treatment2 = new Treatment2(display, graphic, readwriteMain, treatment1); 
+                Treatment3 treatment3 = new Treatment3(display, graphic, readwriteMain, readwriteOther, treatment1, treatment2); 
             }
         });
     }
 }
 
 /*             ____________________________________________________________       
-              || Enregistrement|Graphique|                                ||                                   
+              || Enregistrement|Graphique|Déduction                       ||                                   
               ||                                                          ||
               || Facture                                                  ||
               ||                                                          ||
@@ -63,7 +65,9 @@ public class AppFacture
               ||__________________________________________________________||
 
                ____________________________________________________________  
-              || Enregistrement|Graphique|                                || 
+              || Enregistrement|Graphique|Déduction                       ||
+              ||                                                          ||
+              ||   Annuel/Mensuel     <>-----------------------------     ||
               ||   ___________________________________________________    ||
               ||  |                                                   |   ||
               ||  |                                                   |   || 
@@ -97,5 +101,42 @@ public class AppFacture
               ||                                                          ||
               ||__________________________________________________________||    
               
-
+               ____________________________________________________________  
+              || Enregistrement|Graphique|Déduction                       || 
+              ||                                                          ||
+              ||     Décénie          <>-----------------------------     || 
+              ||     Déductible       <>-----------------------------     || 
+              ||   ___________________________________________________    ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   || 
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   ||
+              ||  |                                                   |   || 
+              ||  |                                                   |   || 
+              ||  |                                                   |   ||
+              ||  |___________________________________________________|   ||
+              ||       Décénie|Déductible                                 ||
+              ||                                                          ||
+              ||      Date d'achat             Déduction     Année        ||
+              ||   [_______(A1)________]>        ■(A2)      [_(A3)_]>     ||  
+              ||                                                          ||
+              ||                                                          ||
+              ||      TTC              HT                     TVA         ||
+              ||    [_(B1)_]        [_(B2)_]                [_(B3)_]      ||
+              ||                                                          ||
+              ||    Déduction                                             ||
+              ||                                                          ||
+              ||                           [Ouvrir](C1)   [Parcourir](C2) ||
+              || [...] [____________________(D1)_____________________]>   ||
+              ||       [____________________(E1)_____________________]>   ||
+              ||                                                          ||
+              ||             [Enrengistrer](F1)       [RAZ](F2)           ||
+              ||__________________________________________________________||
  */

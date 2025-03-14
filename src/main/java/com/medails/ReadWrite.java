@@ -14,41 +14,47 @@ import java.util.Set;
                         LECTURE DE FICHIER
     *************************************************************/
 
-public class ReadFile
+public class ReadWrite
 {
+
     /************************* Variables de classe **************************/
 
     // Nom du fichier
-    private static final String FILENAME = "Facture.txt";
+    public static final String MAINFILENAME = "00_Facture.txt";
+    public static final String OTHERFILENAME = "01_DeductionTVA.txt";
 
     /************************* Variables d'instance' **************************/
-    
-    // Chemin d'accès du fichier
-    public String filePath;
 
     // Création du fichier
-    public File mainFile;
+    public File file;
 
     // Ligne de lecture
     public String line = null;
 
     /*********** Constructeur ***************/
-    public ReadFile()
+    public ReadWrite(String filePath)
     {
-        this.filePath = System.getProperty("user.dir") + File.separator + FILENAME;
-        this.mainFile = new File(filePath);
+        this.file = new File(System.getProperty("user.dir") + File.separator + filePath);
         existFile();
+    }    
+
+
+    // Permet de remplacer le filePath
+    public File getFile()
+    {
+        return this.file;
     }
+
 
     // Vérification existance fichier Facture.txt
     public void existFile()
     {
-        if (!mainFile.exists()) 
+        if (!file.exists()) 
         try
         {
-            if (mainFile.createNewFile())
+            if (file.createNewFile())
             {
-                System.out.println("Fichier crée : " + mainFile.getAbsolutePath());
+                System.out.println("Fichier crée : " + file.getAbsolutePath());
             }
             else
             {
@@ -57,19 +63,19 @@ public class ReadFile
         }
         catch (IOException e)
         {
-            System.out.println("Erreur lors de la création du fichier : " + mainFile.getAbsolutePath());
+            System.out.println("Erreur lors de la création du fichier : " + file.getAbsolutePath());
             e.printStackTrace();
         }
     }
+
 
     // Lecture par ligne : contenant un motif spécifique
     public Set<String> readLinesContaining(String pattern)
     {
         Set<String> allLines = new HashSet<>();
-
         existFile();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(mainFile)))
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
             while ((line = reader.readLine()) != null) 
             {
@@ -86,11 +92,12 @@ public class ReadFile
         return allLines;
     }
 
+
     // Lecture par ligne : commençant par un motif spécifique
     public Set<String> readLinesStarting(String pattern)
     {
         Set<String> allLines = new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(mainFile)))
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
             while ((line = reader.readLine()) != null )
             {
@@ -107,12 +114,13 @@ public class ReadFile
         return allLines;
     }
 
+
     // Ecriture
-    public void writeLinesContaining(List<String> linesToWrite, String outputFilename)
+    public void writeLinesContaining(List<String> linesToWrite)
     {
         existFile();
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mainFile, true )))
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true )))
         {
             for (String line : linesToWrite)
             {
