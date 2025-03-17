@@ -18,6 +18,12 @@ import javax.swing.JOptionPane;
 
 public class Treatment3
 {
+    /************************* Variables de classe **************************/
+
+    // Données pour création graphique
+    public static Double[][][] graphDecenal = new Double[5][5][5]; 
+    public static Double[][][] graphYearMonth = new Double[12][12][12];      
+
     /************************* Variables d'instance **************************/
 
     // Répertoire Facture 
@@ -25,216 +31,132 @@ public class Treatment3
     private final String REP_DEDUCTION = "01 - Professionnelle";
     private final String PDF_DEDUCTION = "Achats";
 
-    // Données pour création graphique
-    public static Double[][][][][] graphDecenal = new Double[5][5][5][5][5];    // Format Year
-    public static Double[][][] graphDeduction = new Double[12][12][12];         // Format Month
-    
     /************* Déclarations Classes ****************/
     private Display dp;
     private Graphic gr;
-    private ReadWrite rwMain;
     private ReadWrite rwOther;
     private Treatment1 tr1;
     private Treatment2 tr2;
 
     /*********** Constructeur ***************/
-    public Treatment3(Display dp, Graphic gr, ReadWrite rwMain, ReadWrite rwOther, Treatment1 tr1, Treatment2 tr2)
+    public Treatment3(Display dp, Graphic gr, ReadWrite rwOther, Treatment1 tr1, Treatment2 tr2)
     {
         this.dp = dp;
-        this.gr = gr;  
-        this.rwMain = rwMain;  
+        this.gr = gr;   
         this.rwOther = rwOther;  
         this.tr1 = tr1;
         this.tr2 = tr2;
 
-        /*********** Graphique ***************/
+        /*********** Appels Méthodes ***************/
         actionJElements();
         calculate();
-        graphListener();
-        txtListener();
-        gr.updateDatasets(graphDecenal, gr.GRAPHYEARS, gr.CATEGORIES, gr.dataTotal);
-
-        /*********** Lien ***************/
-        dp.boxYearsDeduction       .addActionListener (e -> txtListener());
-        dp.btOpenDeduction         .addActionListener (e -> tr1.openPDF(dp.boxRepDeduction, dp.boxPDFDeduction));
-        dp.btSearchDeduction       .addActionListener (e -> tr1.searchDirectory(dp.boxRepDeduction, dp.boxPDFDeduction, DIRECTORY_DEDUCTION));
-        dp.btSaveDeduction         .addActionListener (e -> saveDataListener());
-                                    tr1.popupListener (dp.boxRepDeduction, dp.boxPDFDeduction, REP_DEDUCTION, PDF_DEDUCTION);
-        dp.btResetDeduction        .addActionListener (e -> clearListener());                            
+        graphDecenal();
+        graphYearMonth();   
+        gr.updateDatasets(graphYearMonth, gr.GRAPHMONTHS, gr.SHORTCATEGORIES, gr.dataYearsPan3, gr.dataMonthsPan3);                     
     }
 
     private void actionJElements()
     {
-        /*********** Panel 3 ***************/
-        dp.sliDecade               .addChangeListener (e -> graphListener());
-        dp.sliDeduction            .addChangeListener (e -> graphListener());
-        dp.cckTotal                .addActionListener (e -> graphListener());
+        /*********** Partie Graphique ***************/
+        dp.sliDecadePan3           .addChangeListener (e -> graphDecenal());
+        dp.sliYearMonthPan3        .addChangeListener (e -> graphYearMonth());
+
+        /*********** Partie Text ***************/
         dp.txtTTCPan3              .addActionListener (e -> calculate());
+        dp.boxYearsDeduction       .addActionListener (e -> graphYearMonth());
+        dp.butOpenDeduction        .addActionListener (e -> tr1.openPDF(dp.boxRepDeduction, dp.boxPDFDeduction));
+        dp.butSearchDeduction      .addActionListener (e -> tr1.searchDirectory(dp.boxRepDeduction, dp.boxPDFDeduction, DIRECTORY_DEDUCTION));
+        dp.butSaveDeduction        .addActionListener (e -> saveDataListener());
+                                    tr1.popupListener (dp.boxRepDeduction, dp.boxPDFDeduction, REP_DEDUCTION, PDF_DEDUCTION);
+        dp.butResetDeduction       .addActionListener (e -> clearListener());     
     }
 
     /*********************************************************** 
-                              PANEL 3 
+                           Onglet Décénie
     ***********************************************************/
-    
-    public void graphListener()
+
+    public void graphDecenal()
     {
         // Mise à jour des graphiques avec la nouvelle échelle
-        tr2.slideRange(gr.chartTotal, dp.sliDecade);
-        tr2.slideRange(gr.chartDeduction, dp.sliDeduction);        
+        tr2.slideRange(gr.chartDecadePan3, dp.sliDecadePan3); 
 
         // Vérification existance du fichier
-        rwMain.existFile();
+        rwOther.existFile();
 
         // Initialisation des données graphiques
-        gr.dataTotal.clear();
+        gr.dataDecadePan3.clear();
 
         // Initialisation des données
-        boolean     monthAcre       = false;
-        boolean     acre2024        = false;
-        boolean     acre2025        = false;
-        String      currentYear     = null;
-        String      lastYear        = null;
-        double      graphHT         = 0.0;
-        double      graphTTC        = 0.0;
-        double      graphTVA        = 0.0;
-        double      graphTaxe       = 0.0;
-        double      graphBenefit    = 0.0;
-        double      ii              = 0.0;
-        double      jj              = 0.0;
-        int         refreshYear     = 0;
+        String currentMonth = null;
+        String currentYear  = null;
+        String currentTTC   = null;
+        String currentHT    = null;
+        String currentTVA   = null;
+        double graphTTC     = 0.0;
+        double graphHT      = 0.0;
+        double graphTVA     = 0.0;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(rwMain.getFile()))) 
+        try (BufferedReader reader = new BufferedReader(new FileReader(rwOther.getFile()))) 
         {
-            while ((rwMain.line = reader.readLine()) != null) 
+            while ((rwOther.line = reader.readLine()) != null) 
             {
-                // Détection de l'année sélectionnée
-                if (rwMain.line.contains("Versement --> "))
-                {
-                    // Recherche des années de versement
-                    currentYear = rwMain.line.substring(rwMain.line.length() - 4).trim();
-
-                    // Année 2024 (ACRE)
-                    if (rwMain.line.contains("2024")) 
-                    {
-                        acre2024 = true;
-                        acre2025 = false; 
-                    }
-
-                    // Année 2025 (ACRE)
-                    else if (rwMain.line.contains("2025")) 
-                    {
-                        // Vérification mois (ACRE) 
-                        if ((rwMain.line.contains("janvier") ||
-                             rwMain.line.contains("février") ||
-                             rwMain.line.contains("mars") ||
-                             rwMain.line.contains("avril"))) 
-                            { 
-                                monthAcre = true;
-                                ii++; 
-                            }
-
-                        if ((rwMain.line.contains("mai") ||
-                             rwMain.line.contains("juin") ||
-                             rwMain.line.contains("juillet") ||
-                             rwMain.line.contains("août") || 
-                             rwMain.line.contains("septembre") || 
-                             rwMain.line.contains("octobre") || 
-                             rwMain.line.contains("novembre") || 
-                             rwMain.line.contains("décembre"))) 
-                            {
-                                monthAcre = false;
-                                jj++; 
-                            }
-                            
-                        acre2024 = false;
-                        acre2025 = true;
-                    }
-
-                    // Année sans ACRE
-                    else
-                    {
-                        acre2024 = false;
-                        acre2025 = false;
-                    }
-                }  
+                // Recherche des mois de versement
+                if (rwOther.line.contains("Date --> "))
+                {    
+                    String monthPart = rwOther.line.substring(rwOther.line.indexOf("Date --> ") + 12).trim();
+                    int firstSpaceIndex = monthPart.indexOf(" ");
+                    if (firstSpaceIndex != -1)
+                    { currentMonth = monthPart.substring(0, firstSpaceIndex).trim(); }
+                    currentYear = rwOther.line.substring(rwOther.line.length() - 4).trim();
+                }
     
-
-                // Recherche et calcules à partir du montant HT
-                if (rwMain.line.contains("HT --> ")) 
+                // Recherche de l'ensemble des informations 
+                if (rwOther.line.contains("Deduction TTC --> "))
+                {    
+                    currentTTC = rwOther.line.substring(rwOther.line.indexOf("Deduction TTC --> ") + 18).trim();
+                    graphTTC = Double.parseDouble(currentTTC);
+                }
+                if (rwOther.line.contains("Deduction HT --> "))
                 {
-                    // Vérification changement d'année
-                    if (refreshYear == 0)
-                    {
-                        lastYear = currentYear;
-                        refreshYear++;
-                    }
-                    // Réinitialise si changement d'année
-                    if (!lastYear.equals(currentYear))
-                    {
-                        refreshYear = 0;
-                        graphTTC = 0.0;
-                        graphHT = 0.0;
-                    }
+                    currentHT  = rwOther.line.substring(rwOther.line.indexOf("Deduction HT --> " ) + 17).trim();
+                    graphHT  = Double.parseDouble(currentHT);
+                }
+                if (rwOther.line.contains("Deduction TVA --> "))               
+                {
+                    currentTVA = rwOther.line.substring(rwOther.line.indexOf("Deduction TVA --> ") + 18).trim();
+                    graphTVA = Double.parseDouble(currentTVA);
+                }
 
-                    // Calcule Facture (HT + TTC) 
-                    String convTotalHT = rwMain.line.substring(rwMain.line.indexOf("HT --> ") + 7).trim();
-                    graphTTC += Double.parseDouble(convTotalHT) * tr1.TVA;
-                    graphHT += Double.parseDouble(convTotalHT);
-                    graphTVA = graphTTC - graphHT;
+                /************************* GRAPHIQUE **************************/ 
+                // Réinitialise graphData pour éviter les valeurs résiduelles           
+                for (int kk = 0; kk < gr.GRAPHYEARS.length; kk++)
+                {
+                    for (int ll = 0; ll < gr.SHORTCATEGORIES.length; ll++) 
+                    { 
+                        graphDecenal[kk][kk][ll] = null; 
+                    }
+                }
 
-                    // Année 2024 (ACRE)
-                    if (acre2024) 
+                // Trouve le mois correspondant et stocke la valeur dans le tableau
+                for (int ii = 0; ii < gr.GRAPHYEARS.length; ii++)
+                {
+                    if (gr.GRAPHYEARS[ii].equals(currentYear))
                     {
-                        graphTaxe = graphHT * tr1.ACRE2024;
-                        graphBenefit = graphHT - graphTaxe;
+                        graphDecenal[ii][ii][0] = graphTTC;   
+                        graphDecenal[ii][ii][1] = graphTVA;        
+                        graphDecenal[ii][ii][2] = graphHT; 
                     }
+                }
+                
+                // Renvoie des données calculées vers le graphique
+                gr.updateDatasets(graphDecenal, gr.GRAPHYEARS, gr.SHORTCATEGORIES, gr.dataDecadePan3); 
+            }
 
-                    // Année 2025 (ACRE avec et sans)
-                    if (acre2025) 
-                    {
-                        if(monthAcre)
-                        {
-                            graphTaxe = graphHT * tr1.ACRE2025;
-                            graphBenefit = graphHT - graphTaxe;
-                        }
-                        else
-                        {
-                            graphTaxe = graphHT * tr1.SANS2025;
-                            graphBenefit = graphHT - graphTaxe;
-                        }
-                    }
-
-                    // Année 2025 (sans ACRE) ou > 2025
-                    if ((!acre2024 && !acre2025)) 
-                    {
-                        graphTaxe = graphHT * tr1.SANS20XX;
-                        graphBenefit = graphHT - graphTaxe;
-                    }
-                      
-                    /************************* GRAPHIQUE **************************/                     
-                    // Trouve le mois correspondant et stocke la valeur dans le tableau
-                    for (int kk = 0; kk < gr.GRAPHYEARS.length; kk++)
-                    {
-                        if (gr.GRAPHYEARS[kk].equals(currentYear)) 
-                        {
-                            graphDecenal[kk][kk][kk][kk][0] = graphTTC;   
-                            graphDecenal[kk][kk][kk][kk][1] = graphTVA;        
-                            graphDecenal[kk][kk][kk][kk][2] = graphHT;           
-                            graphDecenal[kk][kk][kk][kk][3] = graphTaxe;   
-                            graphDecenal[kk][kk][kk][kk][4] = graphBenefit;    
-                        }
-                    }
-                        
-                    // Renvoie des données calculées vers le graphique
-                    gr.updateDatasets(graphDecenal, gr.GRAPHYEARS, gr.CATEGORIES, gr.dataTotal); 
-                    
-                    // Réinitialise pour le prochain mois
-                    currentYear    = null;
-                    graphTVA       = 0.0;
-                    graphTaxe      = 0.0;
-                    graphBenefit   = 0.0;
-                }  
-            } 
+            // Réinitialise pour le prochain mois
+            currentMonth   = null;
+            graphTTC       = 0.0;
+            graphHT        = 0.0;
+            graphTTC       = 0.0;
         }
         catch (IOException ex) 
         {
@@ -245,20 +167,21 @@ public class Treatment3
     }
 
     /*********************************************************** 
-                              TextField 
+                    Onglet Annuel / Mensuel
     ***********************************************************/
 
-    public void txtListener()
+    public void graphYearMonth()
     {
         // Mise à jour des graphiques avec la nouvelle échelle
-        tr2.slideRange(gr.chartTotal, dp.sliDecade);
-        tr2.slideRange(gr.chartDeduction, dp.sliDeduction);  
+        tr2.slideRange(gr.chartYearsPan3, dp.sliYearMonthPan3);
+        tr2.slideRange(gr.chartMonthsPan3, dp.sliYearMonthPan3);  
 
         // Vérification existance du fichier
         rwOther.existFile();
 
         // Initialisation des données graphiques
-        gr.dataDeduction.clear();
+        gr.dataYearsPan3.clear();
+        gr.dataMonthsPan3.clear();
 
         // Initialisation des données
         String currentMonth = null;
@@ -310,7 +233,7 @@ public class Treatment3
                     {
                         for (int ll = 0; ll < gr.SHORTCATEGORIES.length; ll++) 
                         { 
-                            graphDeduction[kk][kk][ll] = null; 
+                            graphYearMonth[kk][kk][ll] = null; 
                         }
                     }
 
@@ -323,16 +246,16 @@ public class Treatment3
                             {
                                 if (gr.GRAPHMONTHS[kk].equals(currentMonth)) 
                                 {
-                                    graphDeduction[kk][kk][0] = graphTTC;   
-                                    graphDeduction[kk][kk][1] = graphTVA;        
-                                    graphDeduction[kk][kk][2] = graphHT; 
+                                    graphYearMonth[kk][kk][0] = graphTTC;   
+                                    graphYearMonth[kk][kk][1] = graphTVA;        
+                                    graphYearMonth[kk][kk][2] = graphHT; 
                                 }
                             }
                         }
                     }
                     
                     // Renvoie des données calculées vers le graphique
-                    gr.updateDatasets(graphDeduction, gr.GRAPHMONTHS, gr.SHORTCATEGORIES, gr.dataDeduction); 
+                    gr.updateDatasets(graphYearMonth, gr.GRAPHMONTHS, gr.SHORTCATEGORIES, gr.dataYearsPan3, gr.dataMonthsPan3); 
                 }
 
                 // Réinitialise pour le prochain mois
@@ -350,6 +273,9 @@ public class Treatment3
         }
     }
 
+    /*********************************************************** 
+                          Autres Méthodes
+    ***********************************************************/
 
     // Calcule HT/TVA
     private void calculate()
@@ -433,7 +359,7 @@ public class Treatment3
         JOptionPane.showMessageDialog(null, "Le programme a bien été enregistré",
                                                     "Enregistrement", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    
 
     // F2 -> RAZ
     private void clearListener()

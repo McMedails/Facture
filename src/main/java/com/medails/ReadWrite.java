@@ -16,7 +16,6 @@ import java.util.Set;
 
 public class ReadWrite
 {
-
     /************************* Variables de classe **************************/
 
     // Nom du fichier

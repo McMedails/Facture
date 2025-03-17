@@ -45,8 +45,7 @@ public class Treatment1
     private final String DIRECTORY_DECLA = "M://Multimédia/Bureau/Social/Social - Pc Bureau/00 - Gouvernement/URSSAF/Déclarations";
     private final String REP2_DECLA = "00 - Gouvernement";
     private final String PDF2_DECLA = "Déclaration";
-    
-    /*********** Panel 1 ***************/ 
+     
     // Variables pour calcules
     private double TTC1 = 0.0;
     private double HT1 = 0.0;
@@ -64,7 +63,7 @@ public class Treatment1
         this.dp = dp;
         this.rw = rw;  
          
-        /*********** Panel 1 ***************/ 
+        /*********** Appels Méthodes ***************/
         actionJElements();      
         correctNumber(dp.txtDays);         
         correctNumber(dp.txtTJM);          
@@ -73,21 +72,17 @@ public class Treatment1
 
     private void actionJElements()
     {
-        /*********** Panel 1 ***************/
-        dp.btOpenFacture           .addActionListener (e -> openPDF(dp.boxRep1, dp.boxPDF1));
-        dp.btOpenDecla             .addActionListener (e -> openPDF(dp.boxRep2, dp.boxPDF2));
-        dp.btTVA                   .addActionListener (e -> calculateListener());
-        dp.btSearchFacture         .addActionListener (e -> searchDirectory(dp.boxRep1, dp.boxPDF1, DIRECTORY_FACTURE));
-        dp.btSearchDecla           .addActionListener (e -> searchDirectory(dp.boxRep2, dp.boxPDF2, DIRECTORY_DECLA));
-        dp.btSave                  .addActionListener (e -> saveDataListener());
+        /*********** Partie Text ***************/
+        dp.butOpenFacture          .addActionListener (e -> openPDF(dp.boxRep1, dp.boxPDF1));
+        dp.butOpenDecla            .addActionListener (e -> openPDF(dp.boxRep2, dp.boxPDF2));
+        dp.butTVA                  .addActionListener (e -> calculateListener());
+        dp.butSearchFacture        .addActionListener (e -> searchDirectory(dp.boxRep1, dp.boxPDF1, DIRECTORY_FACTURE));
+        dp.butSearchDecla          .addActionListener (e -> searchDirectory(dp.boxRep2, dp.boxPDF2, DIRECTORY_DECLA));
+        dp.butSave                 .addActionListener (e -> saveDataListener());
                                     popupListener     (dp.boxRep1, dp.boxPDF1, REP1_FACTURE, PDF1_FACTURE);
                                     popupListener     (dp.boxRep2, dp.boxPDF2, REP2_DECLA, PDF2_DECLA);
-        dp.btReset1                .addActionListener (e -> clearListener());
+        dp.butReset1               .addActionListener (e -> clearListener());
     }
-
-    /*********************************************************** 
-                              PANEL 1 
-    ***********************************************************/
     
     // Vérification chiffre dans champ saisie 
     public void correctNumber(JTextField textField) 

@@ -22,7 +22,7 @@ public class AppFacture
                 ReadWrite readwriteOther = new ReadWrite(ReadWrite.OTHERFILENAME);
                 Treatment1 treatment1 = new Treatment1(display, readwriteMain);  
                 Treatment2 treatment2 = new Treatment2(display, graphic, readwriteMain, treatment1); 
-                Treatment3 treatment3 = new Treatment3(display, graphic, readwriteMain, readwriteOther, treatment1, treatment2); 
+                Treatment3 treatment3 = new Treatment3(display, graphic, readwriteOther, treatment1, treatment2); 
             }
         });
     }
@@ -67,7 +67,8 @@ public class AppFacture
                ____________________________________________________________  
               || Enregistrement|Graphique|Déduction                       ||
               ||                                                          ||
-              ||   Annuel/Mensuel     <>-----------------------------     ||
+              ||     Décénie          <>-----------------------------     || 
+              ||     Déductible       <>-----------------------------     || 
               ||   ___________________________________________________    ||
               ||  |                                                   |   ||
               ||  |                                                   |   || 
@@ -84,15 +85,15 @@ public class AppFacture
               ||  |                                                   |   || 
               ||  |                                                   |   ||
               ||  |___________________________________________________|   ||
-              ||       Annuel|Mensuel                                     ||
+              ||   Décénie|Annuel|Mensuel                [Déduction]      ||
               ||                                                          ||
               ||      TTC     TVA     HT      URSSAF      Bénéfices       ||  
               ||     ■(A1)    ■(A2)  ■(A3)     ■(A4)        ■(A5)         ||
               ||                                                          ||
-              ||   Facture                                  [_(B1)_]      ||
+              ||   Facture                                 [_(B1)_]       ||
               ||                                                          ||
-              ||   Total TTC        Total HT                  TVA         ||
-              ||    [_(C1)_]        [_(C2)_]                [_(C3)_]      ||
+              ||   Total TTC        Total HT                 TVA          ||
+              ||    [_(C1)_]        [_(C2)_]               [_(C3)_]       ||
               ||                                                          ||
               ||   URSSAF                                                 ||
               ||                                                          ||
@@ -122,10 +123,10 @@ public class AppFacture
               ||  |                                                   |   || 
               ||  |                                                   |   ||
               ||  |___________________________________________________|   ||
-              ||       Décénie|Déductible                                 ||
+              ||   Décénie|Annuel|Mensuel                                 ||
               ||                                                          ||
-              ||      Date d'achat             Déduction     Année        ||
-              ||   [_______(A1)________]>        ■(A2)      [_(A3)_]>     ||  
+              ||      Date d'achat                           Année        ||
+              ||   [_______(A1)________]>                   [_(A2)_]>     ||  
               ||                                                          ||
               ||                                                          ||
               ||      TTC              HT                     TVA         ||

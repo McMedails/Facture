@@ -33,18 +33,32 @@ public class Graphic
 
     public final int WIDTH_GRAPHIC = 340;
     public final int HEIGHT_GRAPHIC = 400;
-    public DefaultCategoryDataset dataYears = new DefaultCategoryDataset();
-    public DefaultCategoryDataset dataMonths = new DefaultCategoryDataset();
-    public DefaultCategoryDataset dataTotal = new DefaultCategoryDataset();
-    public DefaultCategoryDataset dataDeduction = new DefaultCategoryDataset();
-    public JFreeChart chartYears;
-    public JFreeChart chartMonths;
-    public JFreeChart chartTotal;   
-    public JFreeChart chartDeduction;
-    public ChartPanel chartPanelYears;
-    public ChartPanel chartPanelMonths;
-    public ChartPanel chartPanelTotal;
-    public ChartPanel chartPanelDeduction;
+
+    /*********** Panel 2 ***************/
+    public DefaultCategoryDataset dataDecadePan2 = new DefaultCategoryDataset();
+    public DefaultCategoryDataset dataYearsPan2  = new DefaultCategoryDataset();
+    public DefaultCategoryDataset dataMonthsPan2 = new DefaultCategoryDataset();
+
+    public JFreeChart chartDecadePan2;
+    public JFreeChart chartYearsPan2;
+    public JFreeChart chartMonthsPan2;
+
+    public ChartPanel chartPanelDecadePan2;
+    public ChartPanel chartPanelYearsPan2;
+    public ChartPanel chartPanelMonthsPan2;
+
+    /*********** Panel 3 ***************/
+    public DefaultCategoryDataset dataDecadePan3 = new DefaultCategoryDataset();
+    public DefaultCategoryDataset dataYearsPan3  = new DefaultCategoryDataset();
+    public DefaultCategoryDataset dataMonthsPan3 = new DefaultCategoryDataset();
+
+    public JFreeChart chartDecadePan3;
+    public JFreeChart chartYearsPan3;
+    public JFreeChart chartMonthsPan3;
+
+    public ChartPanel chartPanelDecadePan3;
+    public ChartPanel chartPanelYearsPan3;
+    public ChartPanel chartPanelMonthsPan3;
 
     /************* Déclarations Classes ****************/
     private Display dp;
@@ -54,15 +68,24 @@ public class Graphic
     {
         this.dp = dp;
 
-        chartYears = createChart(dataYears, dp.MINRANGE_GRAPHIC);
-        chartMonths = createChart(dataMonths, dp.MINRANGE_GRAPHIC);
-        chartTotal = createChart(dataTotal, dp.MINRANGE_DEDUCTION);
-        chartDeduction = createChart(dataDeduction, dp.MINRANGE_GRAPHIC);
+        /*********** Panel 2 ***************/
+        chartDecadePan2 = createChart(dataDecadePan2, dp.MINRANGE_YEARMONTHPAN2);
+        chartYearsPan2  = createChart(dataYearsPan2,  dp.MINRANGE_YEARMONTHPAN2);
+        chartMonthsPan2 = createChart(dataMonthsPan2, dp.MINRANGE_YEARMONTHPAN2);
 
-        createGraphic(chartYears,     WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Annuel", dp.pan2, 0, 2, 5);
-        createGraphic(chartMonths,    WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Mensuel", dp.pan2, 0, 2, 5);
-        createGraphic(chartTotal,     WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Décénie", dp.pan3, 0, 4, 3);
-        createGraphic(chartDeduction, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Déductible", dp.pan3, 0, 4, 3);
+        createGraphic(chartDecadePan2, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Décénie", dp.pan2, 0, 2, 5);
+        createGraphic(chartYearsPan2,  WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Annuel",  dp.pan2, 0, 2, 5);
+        createGraphic(chartMonthsPan2, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Mensuel", dp.pan2, 0, 2, 5);
+
+        /*********** Panel 3 ***************/
+        chartDecadePan3 = createChart(dataDecadePan3, dp.MINRANGE_YEARMONTHPAN3);
+        chartYearsPan3  = createChart(dataYearsPan3,  dp.MINRANGE_YEARMONTHPAN3);
+        chartMonthsPan3 = createChart(dataMonthsPan3, dp.MINRANGE_YEARMONTHPAN3);
+
+        createGraphic(chartDecadePan3, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Décénie", dp.pan3, 0, 4, 3);
+        createGraphic(chartYearsPan3,  WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Annuel",  dp.pan3, 0, 4, 3);
+        createGraphic(chartMonthsPan3, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Mensuel", dp.pan3, 0, 4, 3);
+
     }
 
     // Met à jour la plage de l'axe des ordonnées d'un graphique
@@ -110,6 +133,10 @@ public class Graphic
         return chartPanel;
     }
 
+    /*********************************************************** 
+                        Onglet Décénie (Pan2)
+    ***********************************************************/
+
     public void updateDatasets(Double[][][][][] data, String[] graph, String[] categories, 
                                DefaultCategoryDataset categoryDataset) 
     {
@@ -140,7 +167,45 @@ public class Graphic
         }
     }
 
-    // Surcharge 1
+    /*********************************************************** 
+                   Onglet Annuel / Mensuel (Pan2)
+    ***********************************************************/
+
+    public void updateDatasets(Double[][][][][] data, String[] graph, String[] categories, 
+                               DefaultCategoryDataset categoryDataset1, DefaultCategoryDataset categoryDataset2) 
+    {
+        for (int ii = 0; ii < graph.length; ii++) 
+        {   
+            for (int jj = 0; jj < categories.length; jj++) 
+            {   
+                // Récupération de la valeur
+                Double value = data[ii][ii][ii][ii][jj]; 
+    
+                if (value != null) 
+                {
+                    categoryDataset1.addValue(value, categories[jj], graph[ii]);
+                    categoryDataset2.addValue(value, categories[jj], graph[ii]);
+                }
+                else 
+                {
+                    // Vérifier si la clé existe déjà avant d'appeler getValue()
+                    boolean keyExists = categoryDataset1.getColumnIndex(graph[ii]) >= 0 &&
+                                        categoryDataset1.getRowIndex(categories[jj]) >= 0;
+    
+                    // Si la clé n'existe pas, ajouter 0
+                    if (!keyExists)  
+                    {
+                        categoryDataset1.addValue(0.0, categories[jj], graph[ii]);
+                    }
+                }
+            }
+        }
+    }
+
+    /*********************************************************** 
+                        Onglet Décénie (Pan3)
+    ***********************************************************/
+
     public void updateDatasets(Double[][][] data, String[] graph, String[] categories, 
                                DefaultCategoryDataset categoryDataset) 
     {
@@ -171,8 +236,11 @@ public class Graphic
         }
     }
 
-    // Surcharge 2
-    public void updateDatasets(Double[][][][][] data, String[] graph, String[] categories, 
+    /*********************************************************** 
+                   Onglet Annuel / Mensuel (Pan3)
+    ***********************************************************/
+
+    public void updateDatasets(Double[][][] data, String[] graph, String[] categories, 
                                DefaultCategoryDataset categoryDataset1, DefaultCategoryDataset categoryDataset2) 
     {
         for (int ii = 0; ii < graph.length; ii++) 
@@ -180,7 +248,7 @@ public class Graphic
             for (int jj = 0; jj < categories.length; jj++) 
             {   
                 // Récupération de la valeur
-                Double value = data[ii][ii][ii][ii][jj]; 
+                Double value = data[ii][ii][jj]; 
     
                 if (value != null) 
                 {
@@ -191,7 +259,7 @@ public class Graphic
                 {
                     // Vérifier si la clé existe déjà avant d'appeler getValue()
                     boolean keyExists = categoryDataset1.getColumnIndex(graph[ii]) >= 0 &&
-                                        categoryDataset1.getRowIndex(categories[jj]) >= 0;
+                    categoryDataset1.getRowIndex(categories[jj]) >= 0;
     
                     // Si la clé n'existe pas, ajouter 0
                     if (!keyExists)  
