@@ -16,14 +16,7 @@ import org.jfree.chart.JFreeChart;
 
 public class Treatment2
 {
-    /************************* Variables de classe **************************/
 
-    // Données pour création graphique
-    public static Double[][][][][] graphDecenal = new Double[5][5][5][5][5];
-    public static Double[][][][][] graphYearMonth = new Double[12][12][12][12][12];
-
-    /************************* Variables d'instance **************************/
-    
     /************* Déclarations Classes ****************/
     private Display dp;
     private Graphic gr;
@@ -44,6 +37,15 @@ public class Treatment2
         graphYearMonth();
         gr.updateDatasets(graphYearMonth, gr.GRAPHMONTHS, gr.CATEGORIES, gr.dataYearsPan2, gr.dataMonthsPan2);                               
     }
+
+    /************************* Variables de classe **************************/
+    // Données pour création graphique
+    public static Double[][][][][] graphDecenal = new Double[5][5][5][5][5];
+    public static Double[][][][][] graphYearMonth = new Double[12][12][12][12][12];
+
+    /************************************************************ 
+                              METHODES
+    *************************************************************/
 
     private void actionJElements()
     {

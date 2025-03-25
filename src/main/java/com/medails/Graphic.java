@@ -20,8 +20,43 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 public class Graphic
 {
-    /************************* Variables d'instance **************************/
+    /************* Déclarations Classes ****************/
+    private Display dp;
+    
+    /************************************************************ 
+                            CONSTRUCTEUR
+    *************************************************************/
+    
+    public Graphic (Display dp)
+    {
+        this.dp = dp;
 
+        /*********** Panel 2 ***************/
+        chartDecadePan2 = createChart(dataDecadePan2, dp.MINRANGE_YEARMONTHPAN2);
+        chartYearsPan2  = createChart(dataYearsPan2,  dp.MINRANGE_YEARMONTHPAN2);
+        chartMonthsPan2 = createChart(dataMonthsPan2, dp.MINRANGE_YEARMONTHPAN2);
+
+        createGraphic(chartDecadePan2, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Décénie", dp.pan2, 0, 2, 5);
+        createGraphic(chartYearsPan2,  WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Annuel",  dp.pan2, 0, 2, 5);
+        createGraphic(chartMonthsPan2, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Mensuel", dp.pan2, 0, 2, 5);
+
+        /*********** Panel 3 ***************/
+        chartDecadePan3 = createChart(dataDecadePan3, dp.MINRANGE_YEARMONTHPAN3);
+        chartYearsPan3  = createChart(dataYearsPan3,  dp.MINRANGE_YEARMONTHPAN3);
+        chartMonthsPan3 = createChart(dataMonthsPan3, dp.MINRANGE_YEARMONTHPAN3);
+
+        createGraphic(chartDecadePan3, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Décénie", dp.pan3, 0, 4, 3);
+        createGraphic(chartYearsPan3,  WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Annuel",  dp.pan3, 0, 4, 3);
+        createGraphic(chartMonthsPan3, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Mensuel", dp.pan3, 0, 4, 3);
+
+    }
+
+    
+    /************************************************************ 
+                            VARIABLES
+    *************************************************************/
+
+    /************************* Variables d'instance **************************/
     public final String[] GRAPHMONTHS = {"janvier", "février", "mars", "avril", 
                                          "mai", "juin", "juillet", "août", "septembre", 
                                          "octobre", "novembre", "décembre"};
@@ -60,33 +95,9 @@ public class Graphic
     public ChartPanel chartPanelYearsPan3;
     public ChartPanel chartPanelMonthsPan3;
 
-    /************* Déclarations Classes ****************/
-    private Display dp;
-    
-    /*********** Constructeur ***************/
-    public Graphic (Display dp)
-    {
-        this.dp = dp;
-
-        /*********** Panel 2 ***************/
-        chartDecadePan2 = createChart(dataDecadePan2, dp.MINRANGE_YEARMONTHPAN2);
-        chartYearsPan2  = createChart(dataYearsPan2,  dp.MINRANGE_YEARMONTHPAN2);
-        chartMonthsPan2 = createChart(dataMonthsPan2, dp.MINRANGE_YEARMONTHPAN2);
-
-        createGraphic(chartDecadePan2, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Décénie", dp.pan2, 0, 2, 5);
-        createGraphic(chartYearsPan2,  WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Annuel",  dp.pan2, 0, 2, 5);
-        createGraphic(chartMonthsPan2, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabGraph, "Mensuel", dp.pan2, 0, 2, 5);
-
-        /*********** Panel 3 ***************/
-        chartDecadePan3 = createChart(dataDecadePan3, dp.MINRANGE_YEARMONTHPAN3);
-        chartYearsPan3  = createChart(dataYearsPan3,  dp.MINRANGE_YEARMONTHPAN3);
-        chartMonthsPan3 = createChart(dataMonthsPan3, dp.MINRANGE_YEARMONTHPAN3);
-
-        createGraphic(chartDecadePan3, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Décénie", dp.pan3, 0, 4, 3);
-        createGraphic(chartYearsPan3,  WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Annuel",  dp.pan3, 0, 4, 3);
-        createGraphic(chartMonthsPan3, WIDTH_GRAPHIC, HEIGHT_GRAPHIC, dp.tabDeduction, "Mensuel", dp.pan3, 0, 4, 3);
-
-    }
+    /************************************************************ 
+                              METHODES
+    *************************************************************/
 
     // Met à jour la plage de l'axe des ordonnées d'un graphique
     public void updatChartRange(JFreeChart chart, int newRange)

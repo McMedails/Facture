@@ -18,19 +18,6 @@ import javax.swing.JOptionPane;
 
 public class Treatment3
 {
-    /************************* Variables de classe **************************/
-
-    // Données pour création graphique
-    public static Double[][][] graphDecenal = new Double[5][5][5]; 
-    public static Double[][][] graphYearMonth = new Double[12][12][12];      
-
-    /************************* Variables d'instance **************************/
-
-    // Répertoire Facture 
-    private final String DIRECTORY_DEDUCTION = "M://Multimédia/Bureau/Social/Social - Pc Bureau/01 - Professionnelle/Achats";
-    private final String REP_DEDUCTION = "01 - Professionnelle";
-    private final String PDF_DEDUCTION = "Achats";
-
     /************* Déclarations Classes ****************/
     private Display dp;
     private Graphic gr;
@@ -38,7 +25,10 @@ public class Treatment3
     private Treatment1 tr1;
     private Treatment2 tr2;
 
-    /*********** Constructeur ***************/
+    /************************************************************ 
+                            CONSTRUCTEUR
+    *************************************************************/
+
     public Treatment3(Display dp, Graphic gr, ReadWrite rwOther, Treatment1 tr1, Treatment2 tr2)
     {
         this.dp = dp;
@@ -54,6 +44,26 @@ public class Treatment3
         graphYearMonth();   
         gr.updateDatasets(graphYearMonth, gr.GRAPHMONTHS, gr.SHORTCATEGORIES, gr.dataYearsPan3, gr.dataMonthsPan3);                     
     }
+
+
+    /************************************************************ 
+                            VARIABLES
+    *************************************************************/
+    
+    /************************* Variables de classe **************************/
+    // Données pour création graphique
+    public static Double[][][] graphDecenal = new Double[5][5][5]; 
+    public static Double[][][] graphYearMonth = new Double[12][12][12];      
+
+    /************************* Variables d'instance **************************/
+    // Répertoire Facture 
+    private final String DIRECTORY_DEDUCTION = "M://Multimédia/Bureau/Social/Social - Pc Bureau/01 - Professionnelle/Achats";
+    private final String REP_DEDUCTION = "01 - Professionnelle";
+    private final String PDF_DEDUCTION = "Achats";
+
+    /************************************************************ 
+                              METHODES
+    *************************************************************/
 
     private void actionJElements()
     {

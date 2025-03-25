@@ -28,6 +28,23 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Treatment1
 {
+    /************* Déclarations Classes ****************/
+    private Display dp;
+    private ReadWrite rw;
+
+    /*********** Constructeur ***************/
+    public Treatment1(Display dp, ReadWrite rw)
+    {
+        this.dp = dp;
+        this.rw = rw;  
+         
+        /*********** Appels Méthodes ***************/
+        actionJElements();      
+        correctNumber(dp.txtDays);         
+        correctNumber(dp.txtTJM);          
+        clearListener();                                                 
+    }
+
     /************************* Variables d'instance **************************/
     // Taux de taxe
     public final Double ACRE2024 = ((2.2 + 11.6 + 0.2) / 100);  // Année 2024 (ACRE)
@@ -53,22 +70,9 @@ public class Treatment1
     private double Taxe1 = 0.0;
     private double Benefit1 = 0.0;
 
-    /************* Déclarations Classes ****************/
-    private Display dp;
-    private ReadWrite rw;
-
-    /*********** Constructeur ***************/
-    public Treatment1(Display dp, ReadWrite rw)
-    {
-        this.dp = dp;
-        this.rw = rw;  
-         
-        /*********** Appels Méthodes ***************/
-        actionJElements();      
-        correctNumber(dp.txtDays);         
-        correctNumber(dp.txtTJM);          
-        clearListener();                                                 
-    }
+    /************************************************************ 
+                              METHODES
+    *************************************************************/
 
     private void actionJElements()
     {
@@ -83,6 +87,10 @@ public class Treatment1
                                     popupListener     (dp.boxRep2, dp.boxPDF2, REP2_DECLA, PDF2_DECLA);
         dp.butReset1               .addActionListener (e -> clearListener());
     }
+
+    /*********************************************************** 
+                              PANEL 1 
+    ***********************************************************/
     
     // Vérification chiffre dans champ saisie 
     public void correctNumber(JTextField textField) 

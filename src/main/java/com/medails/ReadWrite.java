@@ -16,27 +16,36 @@ import java.util.Set;
 
 public class ReadWrite
 {
-    /************************* Variables de classe **************************/
 
-    // Nom du fichier
-    public static final String MAINFILENAME = "00_Facture.txt";
-    public static final String OTHERFILENAME = "01_DeductionTVA.txt";
+    /************************************************************ 
+                            CONSTRUCTEUR
+    *************************************************************/
 
-    /************************* Variables d'instance' **************************/
-
-    // Création du fichier
-    public File file;
-
-    // Ligne de lecture
-    public String line = null;
-
-    /*********** Constructeur ***************/
     public ReadWrite(String filePath)
     {
         this.file = new File(System.getProperty("user.dir") + File.separator + filePath);
         existFile();
     }    
 
+    /************************************************************ 
+                            VARIABLES
+    *************************************************************/
+
+    /************************* Variables de classe **************************/
+    // Nom du fichier
+    public static final String MAINFILENAME = "00_Facture.txt";
+    public static final String OTHERFILENAME = "01_DeductionTVA.txt";
+
+    /************************* Variables d'instance' **************************/
+    // Création du fichier
+    public File file;
+
+    // Ligne de lecture
+    public String line = null;
+
+    /************************************************************ 
+                              METHODES
+    *************************************************************/
 
     // Permet de remplacer le filePath
     public File getFile()
@@ -45,7 +54,7 @@ public class ReadWrite
     }
 
 
-    // Vérification existance fichier Facture.txt
+    // Vérification existance fichier 
     public void existFile()
     {
         if (!file.exists()) 

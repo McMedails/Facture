@@ -29,9 +29,16 @@ import com.toedter.calendar.JDateChooser;
 
 public class Display
 {    
+    /*********** Constructeur ***************/
+    public Display()
+    {   
+        fenPosition();
+        pan1Position();
+        pan2Position();
+        pan3Position();
+    }
 
     /************************* Variables d'instance **************************/
-    
     // Principaux utilitaires graphiques
     public JFrame fen;
     public JPanel pan1;
@@ -113,14 +120,9 @@ public class Display
                                       "Mai", "Juin", "Juillet", "Août", "Septembre", 
                                       "Octobre", "Novembre", "Décembre"};
         
-    /*********** Constructeur ***************/
-    public Display()
-    {   
-        fenPosition();
-        pan1Position();
-        pan2Position();
-        pan3Position();
-    }
+    /************************************************************ 
+                              METHODES
+    *************************************************************/
 
     public void fenPosition()
     {
@@ -210,7 +212,7 @@ public class Display
     private Font styleFont2 = new Font("Arial", Font.BOLD, 16);
     
     /*********************************************************** 
-                              PANEL 1 
+                            POSITIONNEMENT 
     ***********************************************************/
 
     public void pan1Position()

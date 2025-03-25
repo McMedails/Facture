@@ -62,7 +62,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>AppFacture</mainClass>
+							<mainClass>com.medails.AppFacture</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -82,7 +82,7 @@
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>Facture</mainClass>
+									<mainClass>com.medails.AppFacture</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
@@ -99,6 +99,19 @@
                 </configuration>
             </plugin>
 			
+			 <plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>com.medails.AppFacture</mainClass>
+							</manifest>
+						</archive>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+					</configuration>
+			 </plugin>
 		</plugins>
 	</build>
 
